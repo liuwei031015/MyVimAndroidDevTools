@@ -1,0 +1,111 @@
+*android-dev-tools.txt*  Android Java 开发工具链中文帮助
+
+                             *android-dev-tools*
+本插件将 UltiSnips、fzf、ctags、Gradle、javap、adb 接入 Vim。
+输入 :help android-dev-tools 打开；在帮助链接上按 CTRL-] 跳转，CTRL-T 返回。
+
+目录：
+  安装与准备       |android-dev-install|
+  快捷键           |android-dev-keys|
+  依赖索引与导入   |android-dev-index|
+  构建与新建工程   |android-dev-project|
+  片段与路径补全   |android-dev-snippet|
+
+==============================================================================
+安装与准备                                               *android-dev-install*
+
+需要 Vim、Python 3、Java 17+、Universal Ctags、rg、Android SDK，以及
+fzf.vim、UltiSnips；项目源码标签建议安装 vim-gutentags。
+用 vim-plug 安装本插件及依赖，完整配置见仓库 README。安装后执行
+:helptags ALL。工程需有 gradlew；索引结果放在工程 .vim-api/，建议加入
+.gitignore。SDK 源码包若已安装，插件会在 ~/.cache/vim-android-dev/
+生成可跨工程复用的 SDK 标签。JDK 源码也放在该公共目录。
+
+==============================================================================
+快捷键                                                     *android-dev-keys*
+
+默认 <Leader> 取决于你的 vimrc；设为逗号时，下表的 ,ff 表示依次按 , f f。
+这些都是普通模式映射；Vim 原有的 CTRL-]、CTRL-T 等按键仍保留。
+
+  ,ff       fzf 查 Android 工程文件
+  ,fc       同上，预填光标下单词
+  ,fa       fzf 查当前目录文件
+  ,fb       fzf 查缓冲区
+  ,ft       fzf 查已打开文件的行
+  ,fw       rg 查光标下的文本
+  ,fT       fzf 查光标下的标签
+  ,fB       fzf 查当前缓冲区标签
+  ,fs       fzf 查当前文件类型的片段
+  ,q        为光标下 Java 类插入 import
+
+与 Android Studio macOS 相同、且未占用 Vim 原有普通模式按键时，插件
+另外提供以下映射（终端必须能传递该组合键；GUI Vim 通常更可靠）：
+
+  Option+Enter     导入光标下的类（Android Studio 的快速修复键）
+  Command+O        搜索类
+  Command+Shift+O  搜索文件
+  Command+B        跳到定义
+  Command+6        打开 Logcat
+
+Android Studio 的完整语义补全、智能修复等功能需要语言分析能力，本插件
+只实现上表对应的操作。Vim 原生 CTRL-] 跳定义、CTRL-T 返回；
+插入模式 CTRL-X CTRL-F 补全本地路径。设置
+g:android_dev_ide_mappings = 0 或 g:android_dev_default_mappings = 0
+可分别关闭两组映射。
+
+==============================================================================
+依赖索引与导入                                             *android-dev-index*
+
+  :AndroidIndex [模块 变体]      如 :AndroidIndex :app debug
+  :AndroidClasses [查询]         用 fzf 找 SDK 或第三方类，Enter 打开源码/声明
+  :AndroidMethods [完整类名]     用 javap 查看构造器和公开方法
+  :AndroidImport                为光标下的类插入 import
+  :AndroidJdkSources            索引 JDK src.zip；缺少时下载 OpenJDK 源码
+
+Gradle 导出所选变体实际解析的编译依赖；插件在工程 .vim-api/ 内生成
+classes.json、tags 和无源码库的 Java API 声明。有匹配的 sources.jar 时
+索引真实源码。没有源码时 CTRL-] 跳到声明文件，不会看到实现。已安装
+Android SDK 源码包时，Android 类可跳到真实源码。添加依赖后运行
+:AndroidIndex；普通 :AndroidBuild 成功后也会更新索引。
+JDK 优先读取正在使用的 JDK 自带 src.zip；若没有，:AndroidJdkSources
+从 OpenJDK 官方仓库下载对应版本源码。下载/索引后再执行 :AndroidIndex，
+就能用 CTRL-] 查 JDK 定义、用 :AndroidImport 导入 java.time 等类。
+多 module 工程会先生成依赖 module 的编译产物，类查询尽量打开其真实
+Java 源码。构建后 Android 的 R.txt 会生成 R 类和 R.id、R.layout 等
+资源字段标签；构建前还没有 R.txt 时，先运行 :AndroidBuild。
+
+将光标移到 Java 类名上按 ,q 或执行 :AndroidImport。多个同名类会列出
+候选；可以输入编号选择。普通顶层类、内部类以及 Android SDK 类都可
+从依赖索引导入；项目源码和已加载的其它 tags 也参与查询。
+若没有索引，先运行 :AndroidIndex；:echo tagfiles() 可查看标签文件。
+
+==============================================================================
+构建与新建工程                                             *android-dev-project*
+
+  :AndroidBuild [模块 变体]      运行 assemble 任务，例如 :AndroidBuild :app debug
+  :AndroidInstall [模块 变体]    运行 install 任务，需连接设备
+  :AndroidLog                   在 Vim 终端运行 adb logcat
+  :AndroidNewProject            创建单模块 Java/XML 应用
+
+当工程有多个变体且不能唯一确定 debug 变体时，命令会让你选择。
+构建错误进入 quickfix，使用 :copen、:cnext、:cprev、:cclose 浏览。
+新建工程会询问工程名、包名、目录、最低 SDK，使用已安装的最高 Android
+平台作为 compileSdk，生成 Gradle wrapper、Activity、Manifest 与布局。
+生成后可进入新工程运行 :AndroidBuild 或 :AndroidIndex。
+
+==============================================================================
+片段与路径补全                                             *android-dev-snippet*
+
+插入模式输入触发词，再按 <Leader><Tab> 展开 UltiSnips 片段；CTRL-J
+前进、CTRL-K 后退。:Snippets 或 ,fs 检索当前文件类型的触发词。
+:UltiSnipsEdit 编辑片段。Java 常用：classActivity、classFragment、
+classViewModel、logd、loge、toast、intent、viewbyid、permission。
+XML 常用：rootLayout、aid、resref、constraintlayout、recyclerView、
+stringResource、manifestActivity、usesPermission。完整片段在本插件的
+UltiSnips/ 目录中。
+
+在 Android 工程内输入路径的 `/` 后，若前缀是现存目录，插件会显示
+Vim 原生文件候选；已有部分文件名时按 CTRL-X CTRL-F 手动补全。
+设置 g:android_dev_auto_path = 0 可关闭自动弹出。
+
+vim:tw=78:ts=8:ft=help:norl:

@@ -1,0 +1,692 @@
+
+snippet BuildSDK_INT "SDK version"
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+	$1
+}
+endsnippet
+
+snippet startactivity "Activity launch helper"
+public static void start(Context context) {
+	Intent starter = new Intent(context,`!p snip.rv = snip.basename`.class);
+	context.startActivity(starter);
+}
+endsnippet
+
+snippet package "Package from source directory"
+`!p
+import re
+file_path = vim.eval("expand('%:p:h')")
+match = re.search(r'/src/[^/]+/java/(.+)$', file_path)
+snip.rv = 'package ' + match.group(1).replace('/', '.') + ';' if match else ''
+`
+endsnippet
+
+snippet classActivity "Create Activity file code"
+import android.os.Bundle;
+import android.view.View;
+import android.content.Context;
+import android.content.Intent;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class `!p snip.rv = snip.basename` extends AppCompatActivity {
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.${1:layoutId});
+	}
+
+}
+endsnippet
+
+snippet classFragment "Create fragment"
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+public class `!p snip.rv = snip.basename` extends ${1:Fragment} {
+
+	@Nullable
+	@Override
+	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.${2:fragment_layout}, container, false);
+	}
+
+}
+endsnippet
+
+
+snippet onCreate "ActivityLifecycle"
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		$1
+	}
+endsnippet
+
+snippet onStart "Activity or Fragment lifecycle"
+	@Override
+	public void onStart() {
+		super.onStart();
+		$1
+	}
+endsnippet
+
+snippet onResume "Activity or Fragment lifecycle"
+	@Override
+	public void onResume() {
+		super.onResume();
+		$1
+	}
+endsnippet
+
+snippet onPause "Activity or Fragment lifecycle"
+	@Override
+	public void onPause() {
+		super.onPause();
+		$1
+	}
+endsnippet
+
+snippet onStop "Activity or Fragment lifecycle"
+	@Override
+	public void onStop() {
+		super.onStop();
+		$1
+	}
+endsnippet
+
+snippet onDestroy "Activity or Fragment lifecycle"
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		$1
+	}
+endsnippet
+
+snippet onConfigurationChanged "Activity or Fragment lifecycle"
+	@Override
+	public void onConfigurationChanged(@NonNull Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		$1
+	}
+endsnippet
+
+snippet onActivityResult "Activity onActivityResult"
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		$1
+	}
+endsnippet
+
+snippet onCreateView "Fragment lifecycle"
+	@Nullable
+	@Override
+	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+		return super.onCreateView(inflater, container, savedInstanceState);
+	}
+endsnippet
+
+snippet onViewCreated "Fragment lifecycle"
+	@Override
+	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		$1
+	}
+endsnippet
+
+snippet onAttach "Fragment lifecycle"
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		$1
+	}
+endsnippet
+
+snippet applicationOnCreate "Application onCreate lifecycle"
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		$1
+	}
+endsnippet
+
+snippet attachBaseContext "Application lifecycle"
+	@Override
+	public void attachBaseContext(Context context) {
+		super.attachBaseContext(context);
+		$1
+	}
+endsnippet
+
+snippet classView "Create custom view"
+import android.view.View;
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.View;
+import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+public class `!p snip.rv = snip.basename` extends ${1:View} {
+
+	public `!p snip.rv = snip.basename`(@NonNull Context context) {
+		super(context);
+	}
+
+	public `!p snip.rv = snip.basename`(@NonNull Context context, @Nullable AttributeSet attrs) {
+		super(context, attrs);
+	}
+
+	public `!p snip.rv = snip.basename`(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+	}
+
+	public `!p snip.rv = snip.basename`(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		super(context, attrs, defStyleAttr, defStyleRes);
+	}
+
+
+}
+endsnippet
+
+snippet onVisibilityChanged "View lifecycle"
+	@Override
+	protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+		super.onVisibilityChanged(changedView, visibility);
+		$1
+	}
+endsnippet
+
+snippet onWindowVisibilityChanged "View lifecycle"
+	@Override
+	protected void onWindowVisibilityChanged(int visibility) {
+		super.onWindowVisibilityChanged(visibility);
+		$1
+	}
+endsnippet
+
+snippet onScreenStateChanged "View lifecycle"
+	@Override
+	public void onScreenStateChanged(int screenState) {
+		super.onScreenStateChanged(screenState);
+		$1
+	}
+endsnippet
+
+snippet onAttachedToWindow "View lifecycle"
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		$1
+	}
+endsnippet
+
+snippet onDetachedFromWindow "View lifecycle"
+	@Override
+	protected void onDetachedFromWindow() {
+		super.onDetachedFromWindow();
+		$1
+	}
+endsnippet
+
+snippet classBroadcastReceiver "Create BroadcastReceiver"
+import android.os.Bundle;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+
+public class `!p snip.rv = snip.basename` extends BroadcastReceiver {
+
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		super.onReceive(context,intent);
+		$1
+	}
+
+}
+endsnippet
+
+snippet Dao "Create ROOM Dao interface"
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.Update;
+
+
+@Dao
+public interface `!p snip.rv = snip.basename` {
+
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	public void insert();
+
+	@Dalete
+	public void delete();
+
+	@Update
+	public void update();
+
+	@Query("SELECT * FROM TABLE_NAME WHERE KEY = :params")
+	public LiveData<T> query(String params);
+}
+endsnippet
+
+snippet Database "Create ROOM Database class"
+import androidx.room.Database;
+import androidx.room.RoomDatabase;
+
+@Database(entities = $1.class,version = 1,exportSchema = false)
+public abstract class `!p snip.rv = snip.basename` extends RoomDatabase {
+	public abstract T dataDao();
+}
+endsnippet
+
+snippet classEntity "Create ROOM Entity"
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import com.google.gson.annotations.SerializedName;
+
+// 1, 默认类名为表名，如果需要修改则使用如下配置
+// @Entity(tableName = "users")
+// 2, 如果继承父类字段，则可以使用如下配置忽略相应字段
+// @Entity(ignoredColumns = "picture")
+// 3, 使用 @PrimaryKey 定义主键，如果需要自动生成主键，使用
+// @PrimaryKey(autoGenerate = true)
+
+@Entity
+public class `!p snip.rv = snip.basename` {
+
+	$1
+
+}
+endsnippet
+
+snippet classViewModel "Create ViewModel"
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
+public class `!p snip.rv = snip.basename` extends ViewModel {
+
+	$1
+
+}
+endsnippet
+
+snippet fragmentInflate "Fragment onCreateView" i
+inflater.inflate(R.layout.${1:layout}, null);
+endsnippet
+
+snippet viewInflate "View inflate" i
+View.inflate(${1:context},R.layout.${2:layout},null)
+endsnippet
+
+snippet importRecyclerView "RecyclerView imports"
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import android.graphics.Rect;
+endsnippet
+
+snippet recyclerAdapter "RecyclerView adapter"
+import android.view.View;
+import android.view.ViewGroup;
+import android.content.Context;
+
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+//class Adapter extends RecyclerView.Adapter<PlayerPageAdapterViewHolder> {
+//}
+//常用方法还有：
+//@Override
+//public int getItemViewType(int position) {
+//}
+//@Override
+//public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List payloads) {
+//}
+
+public class `!p snip.rv = snip.basename` extends RecyclerView.Adapter{
+
+	@NonNull
+	@Override
+	public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+	}
+
+	@Override
+	public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+	}
+
+	@Override
+	public int getItemCount() {
+	}
+
+}
+endsnippet
+
+snippet pagingAdapter "Paging adapter"
+import android.view.View;
+import android.view.ViewGroup;
+
+import android.content.Context;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.paging.PagingDataAdapter;
+
+//常用方法还有：
+//	@Override
+//	public int getItemCount() {
+//	}
+//@Override
+//public int getItemViewType(int position) {
+//}
+//@Override
+//public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List payloads) {
+//}
+//class ViewHolder extends RecyclerView.ViewHolder{
+//}
+
+public class `!p snip.rv = snip.basename` extends PagingDataAdapter<${1:${VISUAL}},`!p snip.rv = snip.basename`.${2:ViewHolder}>{
+
+	public `!p snip.rv = snip.basename`(@NonNull DiffUtil.ItemCallback<${0:$1}> diffCallback) {
+		super(diffCallback);
+	}
+
+	@NonNull
+	@Override
+	public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+		return null;
+	}
+
+	@Override
+	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+	}
+
+	class ViewHolder extends RecyclerView.ViewHolder{
+		public ViewHolder(@NonNull View itemView) {
+			super(itemView);
+		}
+	}
+
+	public void bind(${0:$1} data){
+	}
+}
+endsnippet
+
+snippet pagingDiff "Paging adapter ItemCallback" i
+new DiffUtil.ItemCallback<${1:${VISUAL}}>() {
+	@Override
+	public boolean areItemsTheSame(@NonNull ${0:$1} oldItem, @NonNull ${0:$1} newItem) {
+		return false;
+	}
+
+	@Override
+	public boolean areContentsTheSame(@NonNull ${0:$1} oldItem, @NonNull ${0:$1} newItem) {
+		return false;
+	}
+}
+endsnippet
+
+snippet DataSource "DataSource iml"
+import androidx.paging.ListenableFuturePagingSource;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+
+public class `!p snip.rv = snip.basename` extends ListenableFuturePagingSource<Integer, Data>{
+
+	@NotNull
+	@Override
+	public ListenableFuture<LoadResult<Integer, Data>> loadFuture(@NotNull LoadParams<Integer> params){
+		return null;
+	}
+
+	@Nullable
+	@Override
+	public Integer getRefreshKey(@NotNull PagingState<Integer, Data> state) {
+	// Try to find the page key of the closest page to anchorPosition from
+	// either the prevKey or the nextKey; you need to handle nullability
+	// here.
+	//  * prevKey == null -> anchorPage is the first page.
+	//  * nextKey == null -> anchorPage is the last page.
+	//  * both prevKey and nextKey are null -> anchorPage is the
+	//    initial page, so return null.
+	Integer anchorPosition = pagingState.getAnchorPosition();
+	if (anchorPosition == null) {
+		return null;
+	}
+
+	LoadResult.Page<Integer, Data> anchorPage = pagingState.closestPageToPosition(anchorPosition);
+	if (anchorPage == null) {
+		return null;
+	}
+
+	Integer prevKey = anchorPage.getPrevKey();
+	if (prevKey != null) {
+		return prevKey + 1;
+	}
+
+	Integer nextKey = anchorPage.getNextKey();
+	if (nextKey != null) {
+		return nextKey - 1;
+	}
+
+	return null;
+	}
+}
+endsnippet
+
+snippet pagingDao "Paging DAO interface"
+import androidx.paging.PagingSource;
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+
+import java.util.List;
+
+// NOTICE : 必须有insertAll和clearAll方法
+
+@Dao
+public interface `!p snip.rv = snip.basename` {
+
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	void insertAll(List<$1> users);
+
+	@Query("SELECT * FROM ${0:$1} WHERE mLabel LIKE :query")
+	PagingSource<Integer, ${0:$1}> pagingSource(String query);
+
+	@Query("DELETE FROM ${0:$1}")
+	int clearAll();
+
+}
+endsnippet
+
+snippet classWorker "Create WorkManger worker class"
+import android.content.Context;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.work.Worker;
+import androidx.work.Data;
+import androidx.work.WorkerParameters;
+
+// final String value = getInputData().getString(KEY);
+// Result.failure(new Data.Builder().putString(key,value));
+
+public class `!p snip.rv = snip.basename` extends Worker {
+
+	public `!p snip.rv = snip.basename`(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+		super(context, workerParams);
+	}
+
+	@NonNull
+	@Override
+	public Result doWork() {
+		return null;
+	}
+}
+endsnippet
+
+snippet classRemoteMediator "Paging library RemoteMediator"
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelKt;
+import androidx.paging.ExperimentalPagingApi;
+import androidx.paging.ListenableFuturePagingSource;
+import androidx.paging.ListenableFutureRemoteMediator;
+import androidx.paging.LoadType;
+import androidx.paging.Pager;
+import androidx.paging.PagingConfig;
+import androidx.paging.PagingData;
+import androidx.paging.PagingLiveData;
+import androidx.paging.PagingSource;
+import androidx.paging.PagingState;
+import androidx.paging.RemoteMediator;
+
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+
+@ExperimentalPagingApi
+public class `!p snip.rv = snip.basename` extends ListenableFutureRemoteMediator<Integer,$1> {
+
+	//如果需要完全刷新本地数据,返回 InitializeAction.LAUNCH_INITIAL_REFRESH
+	//如果本地数据不需要刷新，返回 InitializeAction.SKIP_INITIAL_REFRESH
+	@NonNull
+	@Override
+	public ListenableFuture<InitializeAction> initializeFuture() {
+		return super.initializeFuture();
+	}
+	//1,根据加载类型和到目前为止已加载的数据，确定要从网络中加载哪个页面。
+	//2,触发网络请求。
+	//3,根据加载操作的结果执行操作：
+	//如果加载成功且收到的项列表不是空的，则将相应的列表项存储到数据库中并返回 MediatorResult.Success(endOfPaginationReached = false)。
+	//存储数据后，使数据源失效，以通知 Paging库新数据的存在。
+	//如果加载成功并且接收到的项列表为空或为最后一页索引，则返回 MediatorResult.Success(endOfPaginationReached = true)。存储数据后，使数据源失效，以通知 Paging 库新数据的存在。
+	//如果请求导致错误，则返回 MediatorResult.Error。
+	//4,LoadType.REFRESH , LoadType.PREPEND , LoadType.APPEND
+	@NonNull
+	@Override
+	public ListenableFuture<MediatorResult> loadFuture(@NonNull LoadType loadType, @NonNull PagingState<Integer, ${0:$1}> pagingState) {
+	}
+}
+endsnippet
+
+snippet pagingState "PagingState code"
+Integer anchorPosition = pagingState.getAnchorPosition();
+if (anchorPosition == null) {
+	return null;
+}
+
+LoadResult.Page<Integer, Data> anchorPage = pagingState.closestPageToPosition(anchorPosition);
+if (anchorPage == null) {
+	return null;
+}
+
+Integer prevKey = anchorPage.getPrevKey();
+if (prevKey != null) {
+	return prevKey + 1;
+}
+
+Integer nextKey = anchorPage.getNextKey();
+if (nextKey != null) {
+	return nextKey - 1;
+}
+endsnippet
+
+snippet ExperimentalPagingApi "Paging api annotation" i
+import androidx.paging.ExperimentalPagingApi;
+@ExperimentalPagingApi
+endsnippet
+
+snippet worke "WorkManger enqueue"
+WorkManager.getInstance($1).enqueue($2);
+endsnippet
+
+snippet workList "WorkManger enqueue beginWith then enqueue"
+WorkManager.getInstance($1).beginWith($2).then($3).enqueue();
+endsnippet
+
+snippet workob " WorkManger getWorkInfoByIdLiveData"
+WorkManager.getInstance($1).getWorkInfoByIdLiveData($2).observe(${0:$1}, new Observer<WorkInfo>() {
+	@Override
+	public void onChanged(WorkInfo workInfo) {
+		if (workInfo.getState().isFinished()){
+			if (workInfo.getState() != WorkInfo.State.SUCCEEDED){
+			}
+		}
+	}
+});
+endsnippet
+
+snippet logd "Log.d call" i
+Log.d("${1:TAG}", "${2:message}");
+endsnippet
+
+snippet loge "Log.e call with exception" i
+Log.e("${1:TAG}", "${2:message}", ${3:error});
+endsnippet
+
+snippet toast "Short Toast" i
+Toast.makeText(${1:context}, ${2:message}, Toast.LENGTH_SHORT).show();
+endsnippet
+
+snippet intent "Explicit Activity Intent" i
+Intent ${1:intent} = new Intent(${2:context}, ${3:TargetActivity}.class);
+$2.startActivity($1);
+endsnippet
+
+snippet bundle "Bundle extra read" i
+String ${1:value} = getIntent().getStringExtra("${2:key}");
+endsnippet
+
+snippet viewbyid "Find a view by ID" i
+${1:View} ${2:view} = findViewById(R.id.${3:view_id});
+endsnippet
+
+snippet getstring "String resource lookup" i
+getString(R.string.${1:name})
+endsnippet
+
+snippet runui "Run on UI thread"
+runOnUiThread(() -> {
+	${1:// Update UI}
+});
+endsnippet
+
+snippet permission "Runtime permission check"
+if (ContextCompat.checkSelfPermission(${1:this}, Manifest.permission.${2:CAMERA})
+		!= PackageManager.PERMISSION_GRANTED) {
+	ActivityCompat.requestPermissions(${1:this},
+			new String[]{Manifest.permission.$2}, ${3:REQUEST_CODE});
+}
+endsnippet

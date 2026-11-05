@@ -1,0 +1,458 @@
+
+snippet rootLayout "Create a new layout file"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	>
+	$1
+</androidx.constraintlayout.widget.ConstraintLayout>
+endsnippet
+
+snippet aid "android:id attribute" i
+android:id="@${1:+}id/${2:name}"
+endsnippet
+
+snippet resref "Android resource reference" i
+@${1|string,drawable,mipmap,color,id,layout,style|}/${2:name}
+endsnippet
+
+snippet apadding "View padding attribute"
+android:padding${1|Start,End,Top,Bottom|}="${2:5}dp"
+endsnippet
+
+snippet amargin "View margin attribute"
+android:layout_margin${1|Start,End,Top,Bottom|}="${2:5}dp"
+endsnippet
+
+snippet abackground "View background attribute"
+android:background="$1"
+endsnippet
+
+snippet avisibility "View visibility attribute"
+android:visibility="${1|visible,gone,invisible|}"
+endsnippet
+snippet visibilityValue "Visibility value" i
+${1|visible,gone,invisible|}
+endsnippet
+
+snippet orientation "LinearLayout orientation attribute"
+android:orientation="${1|vertical,horizontal|}"
+endsnippet
+snippet orientationValue "LinearLayout orientation value" i
+${1|vertical,horizontal|}
+endsnippet
+
+snippet sizeAttrs "View width and height attributes" i
+android:layout_width="${1|match_parent,wrap_content,9dp|}"
+android:layout_height="${2|match_parent,wrap_content,9dp|}"
+endsnippet
+snippet sizeValue "View width or height value" i
+${1|match_parent,wrap_content|}
+endsnippet
+
+snippet focusable "View focusable attribute"
+android:focusable="${1:true}"
+endsnippet
+
+snippet clickable "View clickable attribute"
+android:clickable="${1:true}"
+endsnippet
+
+snippet forceDarkAllowed "View forceDarkAllowed attribute"
+android:forceDarkAllowed="${1:true}"
+endsnippet
+
+snippet enabled "View enabled attribute"
+android:enabled="${1:true}"
+endsnippet
+
+snippet gravity "View gravity attribute"
+android:${1:layout_}gravity="${2|top,bottom,start,end,center,center_vertical,center_horizontal|}"
+endsnippet
+snippet gravityValue "Gravity value" i
+${1|top,bottom,start,end,center,center_vertical,center_horizontal|}
+endsnippet
+
+
+snippet frameClass "FrameLayout class name" i
+FrameLayout
+endsnippet
+
+snippet framelayout "FrameLayout element"
+<FrameLayout
+	$1
+	>
+</FrameLayout>
+endsnippet
+
+snippet linearClass "LinearLayoutCompat class name" i
+androidx.appcompat.widget.LinearLayoutCompat
+endsnippet
+
+snippet linearlayout "LinearLayout element"
+<androidx.appcompat.widget.LinearLayoutCompat
+	$1
+	android:orientation="${2|vertical,horizontal|}"
+	>
+</androidx.appcompat.widget.LinearLayoutCompat>
+endsnippet
+
+snippet weight "LinearLayout weight attribute"
+android:layout_weight="${1:1}"
+endsnippet
+
+#LinearLayoutCompat 分割线属性
+#showDividers
+#  1、none：不显示分隔线；
+#  2、beginning：在LinearLayout的开始处显示分隔线；
+#  3、end：在Linearlayout的结尾处显示分隔线；
+#  4、middle：在LinearLayout中的每两个组件间显示分隔线；
+snippet divider "LinearLayoutCompat divider attributes"
+app:divider="$1"
+app:dividerPadding="${2:9}dp"
+app:showDividers="${3|middle,beginning,end,none|}"
+endsnippet
+snippet constraintClass "ConstraintLayout class name" i
+androidx.constraintlayout.widget.ConstraintLayout
+endsnippet
+
+snippet constraintlayout "ConstraintLayout element"
+<androidx.constraintlayout.widget.ConstraintLayout
+	$1
+	>
+</androidx.constraintlayout.widget.ConstraintLayout>
+endsnippet
+
+# ConstraintLayout 相对定位属性
+snippet constraintTop "ConstraintLayout top constraint"
+app:layout_constraintTop_to${1|Top,Bottom|}Of="${2:parent}"
+endsnippet
+
+snippet constraintBottom "ConstraintLayout bottom constraint"
+app:layout_constraintBottom_to${1|Top,Bottom|}Of="${2:parent}"
+endsnippet
+
+snippet constraintStart "ConstraintLayout start constraint"
+app:layout_constraintStart_to${1|Start,End|}Of="${2:parent}"
+endsnippet
+
+snippet constraintEnd "ConstraintLayout end constraint"
+app:layout_constraintEnd_to${1|Start,End|}Of="${2:parent}"
+endsnippet
+
+snippet constraintBaseline "ConstraintLayout baseline constraint"
+app:layout_constraintBaseline_toBaselineOf="$1"
+endsnippet
+
+# ConstraintLayout 角度定位属性
+snippet constraintCircle "ConstraintLayout circle target"
+app:layout_constraintCircle="${1:id}"
+endsnippet
+
+snippet constraintCircleAngle "ConstraintLayout circle angle"
+app:layout_constraintCircleAngle="${1:50}"
+endsnippet
+
+snippet constraintCircleRadius "ConstraintLayout circle radius"
+app:layout_constraintCircleRadius="${1:50}dp"
+endsnippet
+
+# 设置控件被设置为Gone时的margin值
+snippet goneMargin "ConstraintLayout gone margin"
+app:layout_goneMargin${1|Start,End,Top,Bottom|}="${2:50}dp"
+endsnippet
+
+# 设置控件宽高比,宽高必须有一个设置为0dp才能生效
+snippet dimensionRatio "ConstraintLayout dimension ratio"
+app:layout_constraintDimensionRatio="$1"
+endsnippet
+
+# 设置链样式，需要在链头设置
+snippet chainStyle "ConstraintLayout chain style"
+app:layout_constraint${1|Horizontal,Vertical|}_chainStyle="${2|CHAIN_SPREAD,CHAIN_SPREAD_INSIDE,CHAIN_PACKED|}"
+endsnippet
+snippet chainStyleValue "ConstraintLayout chain style value" i
+${1|CHAIN_SPREAD,CHAIN_SPREAD_INSIDE,CHAIN_PACKED|}
+endsnippet
+
+snippet chainWeight "ConstraintLayout chain weight"
+app:layout_constraint${1|Horizontal,Vertical|}_weight="${2:1}"
+endsnippet
+
+snippet bias "ConstraintLayout bias"
+app:layout_constraint${1|Horizontal,Vertical|}_bias="${2:1}"
+endsnippet
+
+snippet flexClass "FlexboxLayout class name" i
+com.google.android.flexbox.FlexboxLayout
+endsnippet
+
+snippet flexboxLayout "FlexboxLayout element"
+<com.google.android.flexbox.FlexboxLayout
+	$1
+	>
+</com.google.android.flexbox.FlexboxLayout>
+endsnippet
+
+# FleboxLayout 方向
+snippet flexDirection "FleboxLayout flexDirection"
+app:flexDirection="${1|row,row_reverse,column,column_reverse|}"
+endsnippet
+snippet flexDirectionValue "Flexbox direction value" i
+${1|row,row_reverse,column,column_reverse|}
+endsnippet
+
+# FlexboxLayout 换行
+snippet flexWrap "FleboxLayout flexWrap"
+app:flexWrap="${1|nowrap,wrap,wrap_reverse|}"
+endsnippet
+snippet flexWrapValue "Flexbox wrap value" i
+${1|nowrap,wrap,wrap_reverse|}
+endsnippet
+
+# FlexboxLayout 主轴对齐
+snippet flexJustifyContent "Flexbox justifyContent attribute"
+app:justifyContent="${1|flex_start,flex_end,center,space_between,space_around|}"
+endsnippet
+
+snippet flexAlignItems "Flexbox alignItems attribute"
+app:alignItems="${1|flex_start,flex_end,center,baseline,stretch|}"
+endsnippet
+
+snippet flexAlignContent "Flexbox alignContent attribute"
+app:alignContent="${1|flex_start,flex_end,center,space_between,space_around,stretch|}"
+endsnippet
+
+snippet flexAlignSelf "Flexbox child alignSelf attribute"
+app:layout_alignSelf="${1|auto,flex_start,flex_end,center,baseline,stretch|}"
+endsnippet
+
+snippet flexBasisPercent "Flexbox child basis percent"
+app:layout_flexBasisPercent="$1"
+endsnippet
+
+snippet TextView "Create a TextView"
+<androidx.appcompat.widget.AppCompatTextView
+	$1
+	android:textColor="@${2:res}/${3:name}"
+	android:textSize="${4:10sp}"
+	/>
+endsnippet
+
+snippet textDrawable "TextView compound drawable"
+app:drawable${1|Top,Bottom,Start,End|}Compat="$2"
+endsnippet
+
+snippet autoSize "TextView auto size attributes"
+app:autoSizeMaxTextSize="${1:12sp}"
+app:autoSizeMinTextSize="${1:8sp}"
+app:autoSizeTextType="uniform"
+endsnippet
+
+snippet maxLines "TextView maxLines attribute"
+android:maxLines="${1:1}"
+endsnippet
+
+snippet scaleType "ImageView scaleType attribute"
+android:scaleType="${1|fitCenter,fitXY,fitStart,fitEnd,centerCrop,center,centerInside,matrix|}"
+endsnippet
+snippet scaleTypeValue "ImageView scaleType value" i
+${1|fitCenter,fitXY,fitStart,fitEnd,centerCrop,center,centerInside,matrix|}
+endsnippet
+
+# drawable xml
+snippet drawableRoot "Drawable root element"
+<?xml version="1.0" encoding="utf-8"?>
+<${1|shape,selector,layer-list,level-list|} xmlns:android="http://schemas.android.com/apk/res/android">
+	$2
+</${0:$1}>
+endsnippet
+
+snippet drawableType "Drawable element type" i
+${1|shape,layer-list,level-list,selector|}
+endsnippet
+
+snippet shapeType "Shape type attribute" i
+android:shape="${1|rectangle,oval,line,ring|}"
+endsnippet
+
+snippet shapeTypeValue "Shape type value" i
+${1|rectangle,oval,line,ring|}
+endsnippet
+
+snippet shapeChild "Shape child element"
+<${1|corners,gradient,padding,size,solid,stroke|}
+	${2:}
+	/>
+endsnippet
+
+snippet cornerRadius "Shape corner radius attribute" i
+android:${1|topLeftR,topRightR,bottomLeftR,bottomRightR,r|}adius="${2:5}dp"
+endsnippet
+
+snippet gradientAttr "Shape gradient attribute" i
+android:${1|angle,centerX,centerY,centerColor,endColor,gradientRadius,startColor|}="$2"
+endsnippet
+
+snippet gradientType "Shape gradient type attribute" i
+android:type="${1|linear,radial,sweep|}"
+endsnippet
+
+snippet gradientTypeValue "Shape gradient type value" i
+${1|linear,radial,sweep|}
+endsnippet
+
+snippet shapePadding "Shape padding attribute" i
+android:${1|left,top,right,bottom|}="$2dp"
+endsnippet
+
+snippet shapeSolid "Shape solid color element" i
+<solid android:color="$1" />
+endsnippet
+
+snippet shapeStroke "Shape stroke attribute" i
+android:${1|width,color,dashWidth,dashGap|}="$2"
+endsnippet
+
+snippet selectorState "Selector state attribute" i
+android:state_${1|selected,pressed,enabled,activated|}="${2:true}"
+endsnippet
+
+snippet drawableItem "Drawable item element"
+<item
+	$1
+	/>
+endsnippet
+snippet drawableItemBlock "Drawable item block"
+<item>
+	$1
+	</item>
+endsnippet
+
+snippet levelBoundary "Level list boundary attribute" i
+android:${1|max,min|}Level="$2"
+endsnippet
+
+snippet exported "Manifest exported attribute" i
+android:exported="${1:false}"
+endsnippet
+
+snippet intentFilter "Manifest intent-filter element"
+<intent-filter>
+	$1
+</intent-filter>
+endsnippet
+
+snippet editText "EditText element"
+<EditText
+	android:id="$1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:maxLength=""
+	android:maxLines=""
+	android:textSize="10sp"
+	android:textColor=""
+	android:hint=""
+	android:textColorHint=""
+	android:background=""
+	/>
+endsnippet
+
+snippet inputType "EditText inputType attribute" i
+android:inputType="${1|number,textPassword,text,textEmailAddress,phone,date,time|}"
+endsnippet
+
+snippet inputTypeValue "EditText inputType value" i
+${1|number,textPassword,text,textEmailAddress,phone,date,time|}
+endsnippet
+
+snippet maxLength "android:maxLength" i
+android:maxLength="$1"
+endsnippet
+
+snippet textSize "android:textSize" i
+android:textSize="$1"
+endsnippet
+
+snippet textColor "android:textColor" i
+android:textColor="$1"
+endsnippet
+
+snippet textSizeColor "android text size and color" i
+android:textSize="$1"
+android:textColor="$2"
+endsnippet
+
+snippet hint "android:hint" i
+android:hint="$1"
+endsnippet
+
+snippet hintColor "android:textColorHint" i
+android:textColorHint="$1"
+endsnippet
+
+snippet hintAndColor "android text hint and color" i
+android:hint="$1"
+android:textColorHint="$2"
+endsnippet
+
+snippet textStyle "android:textStyle" i
+android:textStyle="bold"
+endsnippet
+
+snippet text "android:text" i
+android:text="$1"
+endsnippet
+
+snippet string "android strings " i
+<string name="$1">$2</string>
+endsnippet
+
+snippet recyclerView "RecyclerView element"
+<androidx.recyclerview.widget.RecyclerView
+	$1
+	/>
+endsnippet
+
+snippet recyclerViewClass "RecyclerView class name" i
+androidx.recyclerview.widget.RecyclerView
+endsnippet
+
+snippet stringResource "String resource element"
+<string name="${1:name}">${2:text}</string>
+endsnippet
+
+snippet colorResource "Color resource element"
+<color name="${1:name}">${2:#000000}</color>
+endsnippet
+
+snippet dimenResource "Dimension resource element"
+<dimen name="${1:name}">${2:16dp}</dimen>
+endsnippet
+
+snippet pluralsResource "Plural resource element"
+<plurals name="${1:name}">
+	<item quantity="one">${2:one item}</item>
+	<item quantity="other">${3:%d items}</item>
+</plurals>
+endsnippet
+
+snippet manifestActivity "Manifest activity declaration"
+<activity
+	android:name=".${1:ActivityName}"
+	android:exported="${2:false}" />
+endsnippet
+
+snippet usesPermission "Manifest permission declaration"
+<uses-permission android:name="android.permission.${1:INTERNET}" />
+endsnippet
+
+snippet constraintFill "ConstraintLayout fill parent constraints"
+app:layout_constraintTop_toTopOf="parent"
+app:layout_constraintBottom_toBottomOf="parent"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintEnd_toEndOf="parent"
+endsnippet

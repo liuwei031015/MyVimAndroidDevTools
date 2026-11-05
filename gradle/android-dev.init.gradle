@@ -1,0 +1,61 @@
+import groovy.json.JsonOutput
+import org.gradle.api.artifacts.type.ArtifactTypeDefinition
+
+gradle.beforeProject { project ->
+    def registerAndroidTasks = {
+        def components = project.extensions.findByName('androidComponents')
+        if (components == null) return
+        components.onVariants(components.selector().all()) { variant ->
+            def variantName = variant.name
+            def suffix = variantName.substring(0, 1).toUpperCase() + variantName.substring(1)
+            def configuration = project.configurations.getByName("${variantName}CompileClasspath")
+            def view = configuration.incoming.artifactView {
+                attributes.attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, 'android-classes-jar')
+            }
+            project.tasks.register("vimApiManifest${suffix}") { task ->
+                task.group = 'vim android development'
+                task.description = "Export ${variantName} compile dependencies for Vim"
+                task.inputs.files(view.files)
+                task.doLast {
+                    def artifacts = view.artifacts.artifacts.collect { artifact ->
+                        [path: artifact.file.absolutePath,
+                         coordinate: artifact.id.componentIdentifier.displayName]
+                    }
+                    def target = new File(project.rootProject.projectDir,
+                            ".vim-api/manifests/${project.path.replace(':', '_')}-${variantName}.json")
+                    target.parentFile.mkdirs()
+                    def modules = project.rootProject.allprojects.findAll {
+                        it.extensions.findByName('android') != null
+                    }.collectEntries { module ->
+                        [(module.path): [directory: module.projectDir.absolutePath,
+                                         namespace: module.extensions.getByName('android').namespace]]
+                    }
+                    target.text = JsonOutput.toJson([
+                            module: project.path, variant: variantName,
+                            sdkDirectory: project.extensions.getByName('android').sdkDirectory.absolutePath,
+                            compileSdk: project.extensions.getByName('android').compileSdk,
+                            projectModules: modules,
+                            artifacts: artifacts])
+                    println "VIM_ANDROID_MANIFEST=${target.absolutePath}"
+                }
+            }
+        }
+    }
+    project.pluginManager.withPlugin('com.android.application', registerAndroidTasks)
+    project.pluginManager.withPlugin('com.android.library', registerAndroidTasks)
+}
+
+gradle.projectsEvaluated {
+    gradle.rootProject.tasks.register('vimApiList') { task ->
+        task.group = 'vim android development'
+        task.doLast {
+            gradle.rootProject.allprojects.each { project ->
+                project.tasks.matching { it.name.startsWith('vimApiManifest') }.each { manifestTask ->
+                    def suffix = manifestTask.name.substring('vimApiManifest'.length())
+                    def variant = suffix.substring(0, 1).toLowerCase() + suffix.substring(1)
+                    println "VIM_ANDROID_VARIANT=${project.path}|${variant}|${manifestTask.path}"
+                }
+            }
+        }
+    }
+}
