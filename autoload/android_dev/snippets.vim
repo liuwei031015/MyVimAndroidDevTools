@@ -1,5 +1,6 @@
 let s:root = fnamemodify(expand('<sfile>:p'), ':h:h:h')
 let s:metadata = json_decode(join(readfile(s:root . '/data/snippet_labels.json'), "\n"))
+let s:completion_tool = s:root . '/python3/tag_completion.py'
 
 function! android_dev#snippets#setup() abort
   if !get(g:, 'android_dev_snippet_popup', 1) || exists(':UltiSnipsAddFiletypes') != 2
@@ -60,6 +61,45 @@ function! android_dev#snippets#candidates(query) abort
   return l:result
 endfunction
 
+function! s:api_candidates(data, query, member) abort
+  let l:methods = []
+  for l:item in get(a:data, 'methods', [])[:9]
+    let l:signature = get(l:item, 'signature', '')
+    call add(l:methods, {'word': l:item.name,
+          \ 'abbr': l:item.name . l:signature,
+          \ 'menu': get(l:item, 'owner', ''), 'info': l:item.name . l:signature,
+          \ 'kind': 'm', 'user_data': json_encode({'type': 'method', 'signature': l:signature})})
+  endfor
+  if a:member
+    return l:methods
+  endif
+  let l:classes = []
+  for l:name in get(a:data, 'classes', [])[:7]
+    call add(l:classes, {'word': l:name, 'abbr': l:name,
+          \ 'menu': '类', 'kind': 'C', 'user_data': 'android_dev_class'})
+  endfor
+  return a:query =~# '^[A-Z]' ? l:classes + l:methods : l:methods + l:classes
+endfunction
+
+function! s:show(buffer, row, column, line, start, items) abort
+  if empty(a:items) || bufnr('%') != a:buffer || mode() !=# 'i'
+        \ || pumvisible() || !empty(complete_info(['mode']).mode)
+        \ || line('.') != a:row || col('.') != a:column || getline('.') !=# a:line
+    return
+  endif
+  let b:android_dev_snippet_pending = {'start': a:start, 'items': a:items}
+  call feedkeys("\<C-x>\<C-u>", 'n')
+endfunction
+
+function! s:api_ready(buffer, row, column, line, start, query, member, snippets, channel, message) abort
+  try
+    let l:data = json_decode(a:message)
+    let l:items = a:snippets + s:api_candidates(l:data, a:query, a:member)
+    call s:show(a:buffer, a:row, a:column, a:line, a:start, l:items)
+  catch
+  endtry
+endfunction
+
 function! android_dev#snippets#schedule() abort
   if !exists('b:android_dev_snippet_items') || empty(b:android_dev_snippet_items)
         \ || pumvisible() || !empty(complete_info(['mode']).mode)
@@ -73,8 +113,21 @@ function! android_dev#snippets#schedule() abort
   if exists('b:android_dev_snippet_timer')
     call timer_stop(b:android_dev_snippet_timer)
   endif
-  let b:android_dev_snippet_timer = timer_start(90,
+  if exists('b:android_dev_snippet_job') && job_status(b:android_dev_snippet_job) ==# 'run'
+    call job_stop(b:android_dev_snippet_job)
+  endif
+  let b:android_dev_snippet_timer = timer_start(150,
         \ function('android_dev#snippets#popup', [bufnr('%'), line('.'), col('.')]))
+endfunction
+
+function! android_dev#snippets#reset() abort
+  if exists('b:android_dev_snippet_timer')
+    call timer_stop(b:android_dev_snippet_timer)
+  endif
+  if exists('b:android_dev_snippet_job') && job_status(b:android_dev_snippet_job) ==# 'run'
+    call job_stop(b:android_dev_snippet_job)
+  endif
+  unlet! b:android_dev_snippet_last b:android_dev_snippet_pending
 endfunction
 
 function! android_dev#snippets#popup(buffer, row, column, timer) abort
@@ -84,16 +137,34 @@ function! android_dev#snippets#popup(buffer, row, column, timer) abort
     return
   endif
   let l:before = strpart(getline('.'), 0, col('.') - 1)
-  let l:prefix = matchstr(l:before, '[A-Za-z][A-Za-z0-9_]*$')
-  let l:start = strlen(l:before) - strlen(l:prefix)
-  if strlen(l:prefix) < 2 || (l:start > 0 && strpart(l:before, l:start - 1, 1) =~# '[.@/:<]')
+  if &filetype ==# 'java' && l:before =~# '^\s*\(import\|package\)\s'
     return
   endif
-  let l:items = android_dev#snippets#candidates(l:prefix)
-  if !empty(l:items)
-    let b:android_dev_snippet_pending = {'start': l:start, 'items': l:items}
-    call feedkeys("\<C-x>\<C-u>", 'n')
+  let l:prefix = matchstr(l:before, '[A-Za-z][A-Za-z0-9_]*$')
+  let l:start = strlen(l:before) - strlen(l:prefix)
+  let l:previous = l:start > 0 ? strpart(l:before, l:start - 1, 1) : ''
+  if strlen(l:prefix) < 2 || l:previous =~# '[@/:<]'
+    return
   endif
+  let l:member = l:previous ==# '.'
+  let l:items = l:member ? [] : android_dev#snippets#candidates(l:prefix)[:5]
+  if &filetype ==# 'java' && strlen(l:prefix) >= 3
+        \ && get(g:, 'android_dev_tag_completion', 1) && has('job')
+    try
+      let l:index = android_dev#current_index()
+    catch
+      let l:index = ''
+    endtry
+    let l:command = ['python3', s:completion_tool, l:index, l:prefix, expand('%:p')]
+          \ + tagfiles()
+    let b:android_dev_snippet_job = job_start(l:command, {'out_cb': function('s:api_ready',
+          \ [a:buffer, a:row, a:column, getline('.'), l:start, l:prefix, l:member, l:items])})
+    if job_status(b:android_dev_snippet_job) ==# 'fail'
+      call s:show(a:buffer, a:row, a:column, getline('.'), l:start, l:items)
+    endif
+    return
+  endif
+  call s:show(a:buffer, a:row, a:column, getline('.'), l:start, l:items)
 endfunction
 
 function! android_dev#snippets#complete(findstart, base) abort
@@ -116,9 +187,66 @@ function! android_dev#snippets#complete(findstart, base) abort
 endfunction
 
 function! android_dev#snippets#expand_selected() abort
-  if get(v:completed_item, 'user_data', '') ==# 'android_dev_snippet'
+  let l:data = get(v:completed_item, 'user_data', '')
+  if l:data ==# 'android_dev_snippet'
     call timer_start(0, function('android_dev#snippets#expand'))
+  elseif l:data =~# '{'
+    let l:item = json_decode(l:data)
+    if get(l:item, 'type', '') ==# 'method'
+      call timer_start(0, function('android_dev#snippets#expand_method',
+            \ [get(v:completed_item, 'word', ''), get(l:item, 'signature', '')]))
+    endif
   endif
+endfunction
+
+function! s:parameter_names(signature) abort
+  let l:body = matchstr(a:signature, '^(\zs.*\ze)')
+  if empty(l:body)
+    return []
+  endif
+  let l:parts = []
+  let l:part = ''
+  let l:depth = 0
+  for l:character in split(l:body, '\zs')
+    if index(['<', '(', '['], l:character) >= 0
+      let l:depth += 1
+    elseif index(['>', ')', ']'], l:character) >= 0
+      let l:depth = max([0, l:depth - 1])
+    elseif l:character ==# ',' && l:depth == 0
+      call add(l:parts, trim(l:part))
+      let l:part = ''
+      continue
+    endif
+    let l:part .= l:character
+  endfor
+  call add(l:parts, trim(l:part))
+  let l:names = []
+  for l:part in l:parts
+    let l:name = l:part =~# '\s' ? matchstr(l:part, '[A-Za-z_$][A-Za-z0-9_$]*$') : ''
+    call add(l:names, empty(l:name) ? 'arg' . (len(l:names) + 1) : l:name)
+  endfor
+  return l:names
+endfunction
+
+function! android_dev#snippets#call_template(signature) abort
+  let l:arguments = []
+  for l:name in s:parameter_names(a:signature)
+    call add(l:arguments, '${' . (len(l:arguments) + 1) . ':' . substitute(l:name, '\$', '_', 'g') . '}')
+  endfor
+  if empty(a:signature)
+    let l:arguments = ['${1}']
+  endif
+  return '(' . join(l:arguments, ', ') . ')'
+endfunction
+
+function! android_dev#snippets#expand_method(name, signature, timer) abort
+  if mode() !=# 'i' || empty(a:name)
+    return
+  endif
+  if strpart(getline('.'), col('.') - 1, 1) ==# '('
+    return
+  endif
+  call UltiSnips#Anon(android_dev#snippets#call_template(a:signature))
 endfunction
 
 function! android_dev#snippets#expand(timer) abort

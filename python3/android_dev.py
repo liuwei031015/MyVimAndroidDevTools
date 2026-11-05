@@ -16,7 +16,7 @@ from jdk_sources import ensure_jdk_sources
 
 
 DECLARATION = re.compile(r"^(.*?)\b(class|interface|enum|record)\s+([\w.$]+)(.*)$")
-INDEX_VERSION = 3
+INDEX_VERSION = 4
 
 
 def unpack_classes(archive, destination):
@@ -187,7 +187,7 @@ def sdk_index(manifest):
                 "source": str(source_file) if source_file.exists() else ""}
         (cache / "classes.json").write_text(json.dumps(classes), encoding="utf-8")
         if source.is_dir():
-            subprocess.run(["ctags", "--languages=Java", "--fields=+n", "--output-format=e-ctags",
+            subprocess.run(["ctags", "--languages=Java", "--fields=+nS", "--output-format=e-ctags",
                             "-R", "-f", str(cache / "tags"), str(source)], check=True)
         (cache / "fingerprint").write_text(stamp)
     return cache
@@ -256,11 +256,14 @@ def build(manifest_path):
                         "bytecode_name": namespace + ".R", "source": str(path.relative_to(temporary))}
         folders = [folder for folder in ("sources", "stubs") if (temporary / folder).exists()]
         if folders:
-            subprocess.run(["ctags", "--languages=Java", "--fields=+n", "--output-format=e-ctags",
+            subprocess.run(["ctags", "--languages=Java", "--fields=+nS", "--output-format=e-ctags",
                             "-R", "-f", "tags", *folders], cwd=temporary, check=True)
         else:
             (temporary / "tags").touch()
         (temporary / "classes.json").write_text(json.dumps(classes, ensure_ascii=False), encoding="utf-8")
+        (temporary / "class-names").write_text(
+            "\n".join(sorted({name.rsplit(".", 1)[-1] for name in classes
+                              if "$" not in name})) + "\n", encoding="utf-8")
         if sdk_cache and (sdk_cache / "tags").exists():
             (temporary / "sdk-tags").write_text(str(sdk_cache / "tags"), encoding="utf-8")
         if jdk_cache and (jdk_cache / "tags").exists():

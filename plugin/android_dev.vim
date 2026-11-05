@@ -86,6 +86,7 @@ augroup android_dev_tools
   autocmd FileType java,xml call android_dev#snippets_setup()
   autocmd FileType java,xml call android_dev#snippets#setup()
   autocmd TextChangedI *.java,*.xml call android_dev#snippets#schedule()
+  autocmd InsertLeave *.java,*.xml call android_dev#snippets#reset()
   autocmd CompleteDone *.java,*.xml call android_dev#snippets#expand_selected()
   autocmd FileType java call android_dev#extra#completion_setup()
 augroup END

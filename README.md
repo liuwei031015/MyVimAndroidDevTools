@@ -68,9 +68,14 @@ The selected variant's generated `R.txt` is converted into a reference-only
 For multi-module builds, the Gradle task resolves project library artifacts and
 class navigation opens the module's actual Java source where available.
 
-Java buffers also offer manual class-name completion with `<C-x><C-u>` from the
-project API index. Set `g:android_dev_tag_completion = 0` to disable it. The
-plugin does not infer receiver types or perform semantic rename.
+Java buffers show class and method candidates automatically after three typed
+characters. Method candidates include signatures and overloads; selecting one
+inserts a call with jumpable argument placeholders. Method candidates are not
+filtered by receiver type, so check the displayed owner before accepting one.
+Manual class-name completion remains available with `<C-x><C-u>`. Set
+`g:android_dev_tag_completion = 0` to disable API candidates. Run
+`:AndroidIndex` after updating to rebuild dependency tags with signatures.
+The plugin does not perform semantic rename.
 
 The included Gradle init script is passed by `:AndroidIndex` without changing a
 project's build scripts. `:AndroidBuild` refreshes the index after a successful

@@ -13,9 +13,41 @@ ROOT = Path(__file__).resolve().parent.parent
 INDEXER = ROOT / "python3/android_dev.py"
 GENERATOR = ROOT / "python3/new_project.py"
 PROJECT_TOOLS = ROOT / "python3/project_tools.py"
+TAG_COMPLETION = ROOT / "python3/tag_completion.py"
 
 
 class ToolTests(unittest.TestCase):
+    def test_tag_method_signatures_and_class_prefix(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "classes.json").write_text(json.dumps({"org.example.Widget": {}}))
+            (root / "class-names").write_text("Widget\n")
+            tags = root / "tags"
+            tags.write_text("!_TAG_FILE_SORTED\t1\t/0=unsorted/\n"
+                            "set\tWidget.java\t1;\"\tm\tclass:Widget\tsignature:(int count)\n"
+                            "set\tWidget.java\t2;\"\tm\tclass:Widget\tsignature:(String text)\n"
+                            "setHidden\tWidget.java\t3;\"\tm\tclass:Widget\taccess:private\n"
+                            "size\tWidget.java\t4;\"\tm\tclass:Widget\tsignature:()\n")
+            output = subprocess.check_output([sys.executable, str(TAG_COMPLETION), str(root),
+                                              "set", "", str(tags)], text=True)
+            data = json.loads(output)
+            self.assertEqual(data["classes"], [])
+            self.assertEqual([item["signature"] for item in data["methods"]],
+                             ["(int count)", "(String text)"])
+            output = subprocess.check_output([sys.executable, str(TAG_COMPLETION), str(root),
+                                              "Wid", "", str(tags)], text=True)
+            self.assertEqual(json.loads(output)["classes"], ["Widget"])
+
+    def test_method_call_parameter_placeholders(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "template"
+            command = ("set rtp^=" + str(ROOT) + " | call writefile(["
+                       "android_dev#snippets#call_template('(Map<String, Integer> values, int flags)'), "
+                       "android_dev#snippets#call_template('()')], '" + str(output) + "') | qa!")
+            subprocess.run(["vim", "-Nu", "NONE", "-n", "-es", "-c", command], check=True)
+            self.assertEqual(output.read_text().splitlines(),
+                             ["(${1:values}, ${2:flags})", "()"])
+
     def test_snippet_menu_labels_cover_bundled_triggers(self):
         labels = json.loads((ROOT / "data/snippet_labels.json").read_text())["labels"]
         for path in (ROOT / "UltiSnips").glob("*.snippets"):
@@ -51,7 +83,8 @@ class ToolTests(unittest.TestCase):
                 location = subprocess.check_output([sys.executable, str(INDEXER), "location", index,
                                                     imported], text=True).strip()
                 self.assertTrue(Path(location).is_file())
-                self.assertIn("count", (Path(index) / "tags").read_text())
+                tags = (Path(index) / "tags").read_text()
+                self.assertRegex(tags, r"count\t[^\n]*signature:\(\)")
                 methods = subprocess.check_output([sys.executable, str(INDEXER), "methods", index,
                                                    imported], text=True)
                 self.assertIn("public int count()", methods)

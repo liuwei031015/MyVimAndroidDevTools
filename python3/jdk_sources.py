@@ -77,7 +77,7 @@ def ensure_jdk_sources(download=False):
     if archive is None:
         return None
     stat = archive.stat()
-    stamp = f"2:{archive}:{stat.st_size}:{stat.st_mtime_ns}"
+    stamp = f"3:{archive}:{stat.st_size}:{stat.st_mtime_ns}"
     if (cache / "fingerprint").is_file() and (cache / "fingerprint").read_text() == stamp:
         return cache
     sources = cache / "sources"
@@ -105,7 +105,7 @@ def ensure_jdk_sources(download=False):
             classes[name] = {"jar": "", "binary": "", "coordinate": "JDK " + version,
                              "bytecode_name": name, "source": str(target)}
     cache.mkdir(parents=True, exist_ok=True)
-    subprocess.run(["ctags", "--languages=Java", "--fields=+n", "--output-format=e-ctags",
+    subprocess.run(["ctags", "--languages=Java", "--fields=+nS", "--output-format=e-ctags",
                     "-R", "-f", str(cache / "tags"), str(sources)], check=True)
     (cache / "classes.json").write_text(json.dumps(classes), encoding="utf-8")
     (cache / "fingerprint").write_text(stamp)
