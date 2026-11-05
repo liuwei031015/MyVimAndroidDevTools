@@ -456,3 +456,105 @@ app:layout_constraintBottom_toBottomOf="parent"
 app:layout_constraintStart_toStartOf="parent"
 app:layout_constraintEnd_toEndOf="parent"
 endsnippet
+
+snippet imageView "ImageView with accessible description"
+<ImageView
+	android:id="@+id/${1:image}"
+	android:layout_width="${2:wrap_content}"
+	android:layout_height="${3:wrap_content}"
+	android:src="@drawable/${4:image_name}"
+	android:contentDescription="@string/${5:image_description}" />
+endsnippet
+
+snippet includeLayout "Include another layout"
+<include layout="@layout/${1:included_layout}" />
+endsnippet
+
+snippet mergeRoot "Merge layout root"
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+	${1:}
+</merge>
+endsnippet
+
+snippet guideline "ConstraintLayout vertical guideline"
+<androidx.constraintlayout.widget.Guideline
+	android:id="@+id/${1:guideline}"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	app:layout_constraintGuide_percent="${2:0.5}" />
+endsnippet
+
+snippet stringArrayResource "String array resource"
+<string-array name="${1:items}">
+	<item>${2:first}</item>
+	<item>${3:second}</item>
+</string-array>
+endsnippet
+
+snippet integerResource "Integer resource"
+<integer name="${1:name}">${2:0}</integer>
+endsnippet
+
+snippet boolResource "Boolean resource"
+<bool name="${1:name}">${2:false}</bool>
+endsnippet
+
+snippet styleResource "Style resource"
+<style name="${1:AppTheme}" parent="${2:@android:style/Theme.Material.Light.NoActionBar}">
+	<item name="${3:android:colorAccent}">@color/${4:accent}</item>
+</style>
+endsnippet
+
+snippet selectorColor "Color state list"
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:state_enabled="false" android:color="@color/${1:disabled}" />
+	<item android:color="@color/${2:enabled}" />
+</selector>
+endsnippet
+
+snippet selectorDrawable "Drawable state list"
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:state_pressed="true" android:drawable="@drawable/${1:pressed}" />
+	<item android:drawable="@drawable/${2:normal}" />
+</selector>
+endsnippet
+
+snippet rippleDrawable "Ripple drawable (API 21+)"
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+	android:color="@color/${1:ripple_color}">
+	<item android:drawable="@drawable/${2:background}" />
+</ripple>
+endsnippet
+
+snippet manifestService "Manifest service declaration"
+<service
+	android:name=".${1:ServiceName}"
+	android:exported="false" />
+endsnippet
+
+snippet manifestReceiver "Manifest receiver declaration"
+<receiver
+	android:name=".${1:ReceiverName}"
+	android:exported="false" />
+endsnippet
+
+snippet manifestProvider "Manifest provider declaration"
+<provider
+	android:name=".${1:ProviderName}"
+	android:authorities="${2:com.example.app}.provider"
+	android:exported="false" />
+endsnippet
+
+snippet deepLinkFilter "HTTPS deep link intent filter"
+<intent-filter android:autoVerify="true">
+	<action android:name="android.intent.action.VIEW" />
+	<category android:name="android.intent.category.DEFAULT" />
+	<category android:name="android.intent.category.BROWSABLE" />
+	<data android:scheme="https" android:host="${1:example.com}" android:pathPrefix="${2:/}" />
+</intent-filter>
+endsnippet

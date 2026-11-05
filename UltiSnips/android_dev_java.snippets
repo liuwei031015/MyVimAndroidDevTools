@@ -690,3 +690,126 @@ if (ContextCompat.checkSelfPermission(${1:this}, Manifest.permission.${2:CAMERA}
 			new String[]{Manifest.permission.$2}, ${3:REQUEST_CODE});
 }
 endsnippet
+
+snippet activityResultLauncher "Activity Result launcher field (AndroidX)"
+private final androidx.activity.result.ActivityResultLauncher<android.content.Intent> ${1:activityLauncher} =
+		registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(), result -> {
+			if (result.getResultCode() == android.app.Activity.RESULT_OK) {
+				android.content.Intent data = result.getData();
+				${2:// Handle result}
+			}
+		});
+endsnippet
+
+snippet activityResultLaunch "Launch Activity Result contract"
+${1:activityLauncher}.launch(new android.content.Intent(${2:this}, ${3:TargetActivity}.class));
+endsnippet
+
+snippet permissionLauncher "Runtime permission launcher field (AndroidX)"
+private final androidx.activity.result.ActivityResultLauncher<String> ${1:permissionLauncher} =
+		registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.RequestPermission(), granted -> {
+			if (granted) {
+				${2:// Continue with permission}
+			} else {
+				${3:// Handle denial}
+			}
+		});
+endsnippet
+
+snippet permissionLaunch "Request permission with registered launcher"
+${1:permissionLauncher}.launch(android.Manifest.permission.${2:CAMERA});
+endsnippet
+
+snippet onSaveState "Save Activity instance state"
+@Override
+protected void onSaveInstanceState(android.os.Bundle outState) {
+	outState.putString("${1:key}", ${2:value});
+	super.onSaveInstanceState(outState);
+}
+endsnippet
+
+snippet restoreState "Restore saved state in onCreate"
+if (savedInstanceState != null) {
+	${1:String value} = savedInstanceState.getString("${2:key}");
+	${3:// Restore UI}
+}
+endsnippet
+
+snippet fragmentArgs "Read Fragment arguments"
+android.os.Bundle ${1:args} = getArguments();
+if ($1 != null) {
+	${2:String value} = $1.getString("${3:key}");
+	${4:// Use argument}
+}
+endsnippet
+
+snippet prefsRead "Read a SharedPreferences string"
+String ${1:value} = ${2:context}.getSharedPreferences("${3:settings}", android.content.Context.MODE_PRIVATE)
+		.getString("${4:key}", "${5:}");
+endsnippet
+
+snippet prefsWrite "Write a SharedPreferences string"
+${1:context}.getSharedPreferences("${2:settings}", android.content.Context.MODE_PRIVATE)
+		.edit().putString("${3:key}", ${4:value}).apply();
+endsnippet
+
+snippet notificationChannel "Create a notification channel (API 26+)"
+if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+	android.app.NotificationChannel ${1:channel} = new android.app.NotificationChannel(
+			"${2:channel_id}", ${3:context}.getString(R.string.${4:channel_name}),
+			android.app.NotificationManager.IMPORTANCE_DEFAULT);
+	android.app.NotificationManager ${5:manager} = $3.getSystemService(android.app.NotificationManager.class);
+	if ($5 != null) {
+		$5.createNotificationChannel($1);
+	}
+}
+endsnippet
+
+snippet clickListener "Find view and set click listener"
+findViewById(R.id.${1:view_id}).setOnClickListener(view -> {
+	${2:// Handle click}
+});
+endsnippet
+
+snippet textWatcher "Attach a TextWatcher"
+${1:editText}.addTextChangedListener(new android.text.TextWatcher() {
+	@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+	@Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+	@Override public void afterTextChanged(android.text.Editable text) {
+		${2:// Handle edited text}
+	}
+});
+endsnippet
+
+snippet dpToPx "Convert dp to pixels"
+int ${1:pixels} = Math.round(${2:16} * ${3:context}.getResources().getDisplayMetrics().density);
+endsnippet
+
+snippet mainThread "Post work to the main thread"
+new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+	${1:// Update UI}
+});
+endsnippet
+
+snippet openUrl "Open a URL with ACTION_VIEW"
+android.content.Intent ${1:intent} = new android.content.Intent(
+		android.content.Intent.ACTION_VIEW, android.net.Uri.parse(${2:url}));
+${3:context}.startActivity($1);
+endsnippet
+
+snippet shareText "Share plain text through chooser"
+android.content.Intent ${1:shareIntent} = new android.content.Intent(android.content.Intent.ACTION_SEND);
+$1.setType("text/plain");
+$1.putExtra(android.content.Intent.EXTRA_TEXT, ${2:text});
+${3:context}.startActivity(android.content.Intent.createChooser($1, ${4:null}));
+endsnippet
+
+snippet contentStream "Read a content URI with try-with-resources"
+try (java.io.InputStream ${1:stream} = ${2:context}.getContentResolver().openInputStream(${3:uri})) {
+	if ($1 != null) {
+		${4:// Read stream}
+	}
+} catch (java.io.IOException ${5:error}) {
+	${6:// Handle I/O error}
+}
+endsnippet

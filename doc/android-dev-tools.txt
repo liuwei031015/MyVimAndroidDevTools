@@ -109,6 +109,22 @@ XML 常用：rootLayout、aid、resref、constraintlayout、recyclerView、
 stringResource、manifestActivity、usesPermission。完整片段在本插件的
 UltiSnips/ 目录中。
 
+Android 工程的 Java/XML 缓冲区会自动加载插件专属 Android 片段；
+普通 Java/XML 文件仍可使用原有的通用片段。新增常用触发词：
+  Java/Android：activityResultLauncher、activityResultLaunch、
+    permissionLauncher、permissionLaunch、onSaveState、restoreState、
+    fragmentArgs、prefsRead、prefsWrite、notificationChannel、
+    clickListener、textWatcher、dpToPx、mainThread、openUrl、shareText、
+    contentStream。
+  XML/Android：imageView、includeLayout、mergeRoot、guideline、
+    stringArrayResource、integerResource、boolResource、styleResource、
+    selectorColor、selectorDrawable、rippleDrawable、manifestService、
+    manifestReceiver、manifestProvider、deepLinkFilter。
+  Java 通用：jtoString、jconst、jtryResource、jrequireNonNull、
+    jparseInt、jforeachMap。
+Activity Result 和权限 Launcher 片段需要工程包含 AndroidX Activity；
+片段应作为 Activity/Fragment 的字段使用，展开后按业务填写回调。
+
 在 Android 工程内输入路径的 `/` 后，若前缀是现存目录，插件会显示
 Vim 原生文件候选；已有部分文件名时按 CTRL-X CTRL-F 手动补全。
 设置 g:android_dev_auto_path = 0 可关闭自动弹出。

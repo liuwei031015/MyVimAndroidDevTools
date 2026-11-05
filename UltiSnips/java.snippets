@@ -1,12 +1,39 @@
 
-snippet tostring "toString method"
+snippet jtoString "toString method"
 @Override
 public String toString() {
 	return "`!p snip.rv = snip.basename`{" +
-			"${1:field}='" + field + '\'' +
+			"${1:field}='" + $1 + '\'' +
 			'}';
 }
 endsnippet
-snippet const "Java static final field"
+snippet jconst "Java static final field"
 ${1:public} static final ${2:int} ${3:key} = ${4:0};
+endsnippet
+
+snippet jtryResource "Try-with-resources and IOException handling"
+try (${1:java.io.InputStream} ${2:input} = ${3:openStream()}) {
+	${4:// Use resource}
+} catch (java.io.IOException ${5:error}) {
+	${6:// Handle I/O error}
+}
+endsnippet
+
+snippet jrequireNonNull "Validate a required argument"
+java.util.Objects.requireNonNull(${1:value}, "${2:value}");
+endsnippet
+
+snippet jparseInt "Parse an integer with error handling"
+try {
+	int ${1:value} = Integer.parseInt(${2:text});
+	${3:// Use value}
+} catch (NumberFormatException ${4:error}) {
+	${5:// Handle invalid input}
+}
+endsnippet
+
+snippet jforeachMap "Iterate over map entries"
+for (java.util.Map.Entry<${1:String}, ${2:String}> ${3:entry} : ${4:map}.entrySet()) {
+	${5:// Use entry.getKey() and entry.getValue()}
+}
 endsnippet

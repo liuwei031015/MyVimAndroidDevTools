@@ -238,6 +238,25 @@ function! android_dev#path_setup() abort
   inoremap <buffer><expr> / android_dev#path_slash()
 endfunction
 
+function! android_dev#snippets_setup() abort
+  if exists('b:android_dev_snippets') || exists(':UltiSnipsAddFiletypes') != 2
+    return
+  endif
+  try
+    call s:root()
+  catch
+    return
+  endtry
+  if &filetype ==# 'java'
+    UltiSnipsAddFiletypes android_dev_java.java
+  elseif &filetype ==# 'xml'
+    UltiSnipsAddFiletypes android_dev_xml.xml
+  else
+    return
+  endif
+  let b:android_dev_snippets = 1
+endfunction
+
 function! android_dev#path_slash() abort
   let l:before = strpart(getline('.'), 0, col('.') - 1)
   let l:path = matchstr(l:before, '[^ \t"''=():;,]*$')

@@ -79,4 +79,11 @@ run `:AndroidIndex` after changing dependencies.
 
 For the complete shortcut list and troubleshooting, see `:help android-dev-tools`.
 
+Android project Java/XML buffers automatically merge the bundled Android
+UltiSnips files with their normal filetype snippets. The templates cover
+Activity Result, permissions, saved state, preferences, notification channels,
+view events, resources, drawables, and manifest declarations. AndroidX templates
+require the corresponding AndroidX dependency in the project. Browse triggers
+with `:Snippets` or see `:help android-dev-snippet`.
+
 Run focused checks with `python3 -m unittest discover -s tests -v`.
