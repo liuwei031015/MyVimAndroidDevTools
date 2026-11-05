@@ -256,6 +256,8 @@ endfunction
 
 function! android_dev#extra#completion_setup() abort
   if get(g:, 'android_dev_tag_completion', 1) && &filetype ==# 'java'
-    setlocal completefunc=android_dev#extra#complete
+    if !get(g:, 'android_dev_snippet_popup', 1)
+      setlocal completefunc=android_dev#extra#complete
+    endif
   endif
 endfunction

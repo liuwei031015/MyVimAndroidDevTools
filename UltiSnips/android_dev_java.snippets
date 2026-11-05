@@ -1,3 +1,4 @@
+priority 1
 
 snippet BuildSDK_INT "SDK version"
 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -812,4 +813,58 @@ try (java.io.InputStream ${1:stream} = ${2:context}.getContentResolver().openInp
 } catch (java.io.IOException ${5:error}) {
 	${6:// Handle I/O error}
 }
+endsnippet
+
+snippet activityGetContent "Pick a document with Activity Result (AndroidX)"
+private final androidx.activity.result.ActivityResultLauncher<String> ${1:pickContent} =
+		registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.GetContent(), uri -> {
+			if (uri != null) {
+				${2:// Read selected URI}
+			}
+		});
+endsnippet
+
+snippet viewModelGet "Get an AndroidX ViewModel"
+${1:MyViewModel} ${2:viewModel} = new androidx.lifecycle.ViewModelProvider(${3:this}).get($1.class);
+endsnippet
+
+snippet liveDataObserve "Observe LiveData with lifecycle owner"
+${1:viewModel}.${2:items}.observe(${3:this}, value -> {
+	${4:// Update UI}
+});
+endsnippet
+
+snippet recyclerSetup "Configure RecyclerView layout and adapter"
+${1:recyclerView}.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(${2:context}));
+$1.setAdapter(${3:adapter});
+endsnippet
+
+snippet fragmentReplace "Replace Fragment and add to back stack"
+getParentFragmentManager().beginTransaction()
+		.replace(R.id.${1:container}, new ${2:TargetFragment}())
+		.addToBackStack(null)
+		.commit();
+endsnippet
+
+snippet workOnce "Enqueue an AndroidX one-time worker"
+androidx.work.OneTimeWorkRequest ${1:request} =
+		new androidx.work.OneTimeWorkRequest.Builder(${2:MyWorker}.class).build();
+androidx.work.WorkManager.getInstance(${3:context}).enqueue($1);
+endsnippet
+
+snippet notificationCompat "Build a compatible notification (AndroidX)"
+android.app.Notification ${1:notification} = new androidx.core.app.NotificationCompat.Builder(${2:context}, "${3:channel_id}")
+		.setSmallIcon(R.drawable.${4:ic_notification})
+		.setContentTitle(${5:title})
+		.setContentText(${6:message})
+		.build();
+endsnippet
+
+snippet contextColor "Read color resource with ContextCompat"
+int ${1:color} = androidx.core.content.ContextCompat.getColor(${2:context}, R.color.${3:color_name});
+endsnippet
+
+snippet viewBindingInflate "Inflate ViewBinding in Activity"
+${1:ActivityMainBinding} ${2:binding} = $1.inflate(getLayoutInflater());
+setContentView($2.getRoot());
 endsnippet

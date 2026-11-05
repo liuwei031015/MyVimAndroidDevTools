@@ -1,3 +1,4 @@
+priority 1
 
 snippet rootLayout "Create a new layout file"
 <?xml version="1.0" encoding="utf-8"?>
@@ -557,4 +558,61 @@ snippet deepLinkFilter "HTTPS deep link intent filter"
 	<category android:name="android.intent.category.BROWSABLE" />
 	<data android:scheme="https" android:host="${1:example.com}" android:pathPrefix="${2:/}" />
 </intent-filter>
+endsnippet
+
+snippet aContentDescription "Accessibility content description attribute"
+android:contentDescription="@string/${1:description}"
+endsnippet
+
+snippet aImportantForAccessibility "Accessibility importance attribute"
+android:importantForAccessibility="${1|auto,yes,no,noHideDescendants|}"
+endsnippet
+
+snippet aElevation "View elevation attribute"
+android:elevation="${1:4dp}"
+endsnippet
+
+snippet aForeground "View foreground attribute"
+android:foreground="@drawable/${1:foreground}"
+endsnippet
+
+snippet aTint "Image tint attribute"
+android:tint="@color/${1:tint}"
+endsnippet
+
+snippet aAdjustViewBounds "ImageView adjustViewBounds attribute"
+android:adjustViewBounds="true"
+endsnippet
+
+snippet aClipToPadding "Scrolling container clipToPadding attribute"
+android:clipToPadding="false"
+endsnippet
+
+snippet aFillViewport "ScrollView fillViewport attribute"
+android:fillViewport="true"
+endsnippet
+
+snippet aTextAppearance "Text appearance attribute"
+android:textAppearance="@style/${1:TextAppearanceApp}"
+endsnippet
+
+snippet aEllipsize "Text ellipsize and max lines"
+android:ellipsize="end"
+android:maxLines="${1:1}"
+endsnippet
+
+snippet aImeOptions "Keyboard action attribute"
+android:imeOptions="${1|actionDone,actionNext,actionSearch,actionSend|}"
+endsnippet
+
+snippet toolsContext "Layout preview Activity context"
+tools:context=".${1:MainActivity}"
+endsnippet
+
+snippet toolsText "Layout preview text"
+tools:text="${1:Preview text}"
+endsnippet
+
+snippet aSrcCompat "AppCompat image resource attribute"
+app:srcCompat="@drawable/${1:image_name}"
 endsnippet

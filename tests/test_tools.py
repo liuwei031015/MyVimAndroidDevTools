@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -15,6 +16,12 @@ PROJECT_TOOLS = ROOT / "python3/project_tools.py"
 
 
 class ToolTests(unittest.TestCase):
+    def test_snippet_menu_labels_cover_bundled_triggers(self):
+        labels = json.loads((ROOT / "data/snippet_labels.json").read_text())["labels"]
+        for path in (ROOT / "UltiSnips").glob("*.snippets"):
+            triggers = set(re.findall(r"^snippet\s+(\S+)", path.read_text(), re.MULTILINE))
+            self.assertFalse(triggers - labels.keys(), f"Missing labels in {path.name}")
+
     def test_jar_aar_index_import_and_methods(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

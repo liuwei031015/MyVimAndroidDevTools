@@ -109,6 +109,12 @@ XML 常用：rootLayout、aid、resref、constraintlayout、recyclerView、
 stringResource、manifestActivity、usesPermission。完整片段在本插件的
 UltiSnips/ 目录中。
 
+Java/XML 中输入至少两个英文字母，会自动弹出带中文说明的候选。
+按 CTRL-N/CTRL-P 选择，CTRL-Y 确认后直接展开片段；可继续用原来的
+<Leader><Tab> 手动展开。常用片段也可输入拼音前缀，例如 quanxian
+可找到 permission。若不需要自动候选，在 vimrc 中、加载插件前设置
+let g:android_dev_snippet_popup = 0。
+
 Android 工程的 Java/XML 缓冲区会自动加载插件专属 Android 片段；
 普通 Java/XML 文件仍可使用原有的通用片段。新增常用触发词：
   Java/Android：activityResultLauncher、activityResultLaunch、
@@ -121,9 +127,19 @@ Android 工程的 Java/XML 缓冲区会自动加载插件专属 Android 片段�
     selectorColor、selectorDrawable、rippleDrawable、manifestService、
     manifestReceiver、manifestProvider、deepLinkFilter。
   Java 通用：jtoString、jconst、jtryResource、jrequireNonNull、
-    jparseInt、jforeachMap。
+    jparseInt、jforeachMap、streamFilter、streamMap、streamDistinct、
+    streamGroupBy、streamFirst、streamCount、streamAnyMatch、streamForEach。
+  AndroidX：activityGetContent、viewModelGet、liveDataObserve、
+    recyclerSetup、fragmentReplace、workOnce、notificationCompat、
+    contextColor、viewBindingInflate。
+  XML 属性：aContentDescription、aElevation、aForeground、aTint、
+    aTextAppearance、aEllipsize、aImeOptions、aSrcCompat 等。
 Activity Result 和权限 Launcher 片段需要工程包含 AndroidX Activity；
 片段应作为 Activity/Fragment 的字段使用，展开后按业务填写回调。
+Stream API 在 Android 7.0 (API 24) 起可直接使用；更低的 minSdk
+需要配置 core library desugaring。AndroidX 片段需要对应依赖，
+ViewBinding 片段还需要在 Gradle 中启用 viewBinding。
+XML 属性种类庞大且包含自定义属性，这里仅覆盖常见写法。
 
 在 Android 工程内输入路径的 `/` 后，若前缀是现存目录，插件会显示
 Vim 原生文件候选；已有部分文件名时按 CTRL-X CTRL-F 手动补全。

@@ -86,4 +86,13 @@ view events, resources, drawables, and manifest declarations. AndroidX templates
 require the corresponding AndroidX dependency in the project. Browse triggers
 with `:Snippets` or see `:help android-dev-snippet`.
 
+In Java and XML, typing at least two letters opens Vim's native snippet menu.
+Entries show Chinese descriptions; common snippets also match pinyin aliases
+(for example, `quanxian` finds `permission`). Use Ctrl-N/Ctrl-P and Ctrl-Y to
+select and expand, or keep using the UltiSnips expansion key. Set
+`g:android_dev_snippet_popup = 0` before loading the plugin to disable the menu.
+The included Java Stream templates need API 24+ or core library desugaring on
+older Android versions. AndroidX and ViewBinding templates need their matching
+project dependencies and build features.
+
 Run focused checks with `python3 -m unittest discover -s tests -v`.

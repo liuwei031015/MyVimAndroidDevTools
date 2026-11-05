@@ -37,3 +37,41 @@ for (java.util.Map.Entry<${1:String}, ${2:String}> ${3:entry} : ${4:map}.entrySe
 	${5:// Use entry.getKey() and entry.getValue()}
 }
 endsnippet
+
+snippet streamFilter "Stream filter and collect to list"
+${1:items}.stream()
+		.filter(item -> ${2:item != null})
+		.collect(java.util.stream.Collectors.toList())
+endsnippet
+
+snippet streamMap "Stream map and collect to list"
+${1:items}.stream()
+		.map(item -> ${2:item.toString()})
+		.collect(java.util.stream.Collectors.toList())
+endsnippet
+
+snippet streamDistinct "Stream distinct values"
+${1:items}.stream().distinct().collect(java.util.stream.Collectors.toList())
+endsnippet
+
+snippet streamGroupBy "Stream groupingBy collector"
+${1:items}.stream().collect(java.util.stream.Collectors.groupingBy(item -> ${2:item.getCategory()}))
+endsnippet
+
+snippet streamFirst "Find first matching stream element"
+${1:items}.stream().filter(item -> ${2:item != null}).findFirst().orElse(null)
+endsnippet
+
+snippet streamCount "Count matching stream elements"
+${1:items}.stream().filter(item -> ${2:item != null}).count()
+endsnippet
+
+snippet streamAnyMatch "Check whether any stream element matches"
+${1:items}.stream().anyMatch(item -> ${2:item != null})
+endsnippet
+
+snippet streamForEach "Process each stream element"
+${1:items}.stream().forEach(item -> {
+	${2:// Process item}
+});
+endsnippet
