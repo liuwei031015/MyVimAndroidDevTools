@@ -14,6 +14,14 @@ function! s:root() abort
   return fnamemodify(l:wrapper, ':p:h')
 endfunction
 
+function! android_dev#project_root() abort
+  return s:root()
+endfunction
+
+function! android_dev#select_variant(...) abort
+  return s:choose(s:root(), a:000)
+endfunction
+
 function! s:gradle(root, task) abort
   let l:command = 'cd ' . shellescape(a:root) . ' && ./gradlew --console=plain -I '
         \ . shellescape(s:init) . ' ' . shellescape(a:task)
@@ -191,6 +199,10 @@ function! s:current_index() abort
   return fnamemodify(l:indexes[0], ':h')
 endfunction
 
+function! android_dev#current_index() abort
+  return s:current_index()
+endfunction
+
 function! s:query(action, index, word) abort
   let l:cmd = 'python3 ' . shellescape(s:script) . ' ' . a:action . ' '
         \ . shellescape(a:index) . ' ' . shellescape(a:word)
@@ -359,12 +371,15 @@ function! android_dev#build(kind, ...) abort
     cwindow
     if v:shell_error
       echoerr a:kind . ' failed; see :copen or :messages'
+      return 0
     else
       echom a:kind . ' succeeded: ' . l:task
       call android_dev#index(l:item.module, l:item.variant)
+      return 1
     endif
   catch
     echoerr v:exception
+    return 0
   endtry
 endfunction
 

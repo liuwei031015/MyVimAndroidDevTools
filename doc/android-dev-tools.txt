@@ -10,6 +10,7 @@
   依赖索引与导入   |android-dev-index|
   构建与新建工程   |android-dev-project|
   片段与路径补全   |android-dev-snippet|
+  运行、资源与检查 |android-dev-workflow|
 
 ==============================================================================
 安装与准备                                               *android-dev-install*
@@ -37,6 +38,8 @@ fzf.vim、UltiSnips；项目源码标签建议安装 vim-gutentags。
   ,fB       fzf 查当前缓冲区标签
   ,fs       fzf 查当前文件类型的片段
   ,q        为光标下 Java 类插入 import
+  ,fr       查找光标下资源
+  ,fu       查找光标下文本的引用
 
 与 Android Studio macOS 相同、且未占用 Vim 原有普通模式按键时，插件
 另外提供以下映射（终端必须能传递该组合键；GUI Vim 通常更可靠）：
@@ -46,6 +49,7 @@ fzf.vim、UltiSnips；项目源码标签建议安装 vim-gutentags。
   Command+Shift+O  搜索文件
   Command+B        跳到定义
   Command+6        打开 Logcat
+  Shift+F10        构建、安装并运行应用
 
 Android Studio 的完整语义补全、智能修复等功能需要语言分析能力，本插件
 只实现上表对应的操作。Vim 原生 CTRL-] 跳定义、CTRL-T 返回；
@@ -61,6 +65,7 @@ g:android_dev_ide_mappings = 0 或 g:android_dev_default_mappings = 0
   :AndroidMethods [完整类名]     用 javap 查看构造器和公开方法
   :AndroidImport                为光标下的类插入 import
   :AndroidJdkSources            索引 JDK src.zip；缺少时下载 OpenJDK 源码
+  :AndroidSources [模块 变体]     用 Gradle 获取第三方 sources.jar 并更新索引
 
 Gradle 导出所选变体实际解析的编译依赖；插件在工程 .vim-api/ 内生成
 classes.json、tags 和无源码库的 Java API 声明。有匹配的 sources.jar 时
@@ -107,5 +112,31 @@ UltiSnips/ 目录中。
 在 Android 工程内输入路径的 `/` 后，若前缀是现存目录，插件会显示
 Vim 原生文件候选；已有部分文件名时按 CTRL-X CTRL-F 手动补全。
 设置 g:android_dev_auto_path = 0 可关闭自动弹出。
+Java 中按 CTRL-X CTRL-U 可从已索引的类名手动补全；不推断对象类型。
+设置 g:android_dev_tag_completion = 0 可关闭。
+
+==============================================================================
+运行、资源与检查                                         *android-dev-workflow*
+
+  :AndroidDevice                  选择并记住当前 adb 设备
+  :AndroidRun [模块 变体]         构建、安装并启动应用
+  :AndroidAppLog [V/D/I/W/E/F]    按进程和最低级别查看应用日志
+  :AndroidResources [@类型/名称]  查找当前 module 的资源
+  :AndroidReferences [文本]      用 rg 查询引用，结果进入 quickfix
+  :AndroidLint [模块 变体]        运行对应变体的 Lint
+  :AndroidUnitTest [模块 变体]    运行本地单元测试
+  :AndroidDeviceTest [模块 变体]  在连接设备上运行 Android 测试
+  :AndroidTasks                  用 fzf 选择并运行 Gradle 任务
+  :AndroidReports                用 fzf 选择并打开 HTML 报告
+
+:AndroidResources 无参数时读取光标下的 R.id.name、@string/name 等；
+也可以传入资源名。选中 XML 后在 Vim 打开，选中 PNG/JPEG/WebP 等
+位图后调用系统图片查看程序。资源按当前 module 和变体的 source set 搜索；
+同名资源会列出候选。:AndroidReferences 是文本搜索，不能用于安全的
+跨文件语义重命名。
+
+:AndroidRun 只适用于 application module；多设备时会选择设备。已运行
+应用的 :AndroidAppLog 可按进程过滤；应用停止后需要重新执行该命令。
+检查结果写入 quickfix，使用 :copen、:cnext、:cprev 浏览。
 
 vim:tw=78:ts=8:ft=help:norl:

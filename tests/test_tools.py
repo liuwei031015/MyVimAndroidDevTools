@@ -11,6 +11,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parent.parent
 INDEXER = ROOT / "python3/android_dev.py"
 GENERATOR = ROOT / "python3/new_project.py"
+PROJECT_TOOLS = ROOT / "python3/project_tools.py"
 
 
 class ToolTests(unittest.TestCase):
@@ -95,6 +96,44 @@ class ToolTests(unittest.TestCase):
             r_class = subprocess.check_output([sys.executable, str(INDEXER), "imports", index, "R"],
                                               text=True).strip()
             self.assertEqual(r_class, "org.example.library.R")
+
+    def test_resource_lookup_by_module_variant_and_type(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            main = root / "app/src/main/res"
+            debug = root / "app/src/debug/res"
+            library = root / "library/src/main/res"
+            for folder in (main / "values", main / "drawable", debug / "values",
+                           library / "values"):
+                folder.mkdir(parents=True)
+            (main / "values/colors.xml").write_text(
+                '<resources>\n<color name="brand">#ff0000</color>\n</resources>\n')
+            (debug / "values/colors.xml").write_text(
+                '<resources><color name="brand">#00ff00</color></resources>')
+            (library / "values/colors.xml").write_text(
+                '<resources><color name="brand">#0000ff</color></resources>')
+            (main / "drawable/icon.png").write_bytes(b"png")
+            output = subprocess.check_output([sys.executable, str(PROJECT_TOOLS), "resources",
+                                              str(root), ":app", "debug", "@color/brand"], text=True)
+            self.assertEqual(len(output.splitlines()), 2)
+            self.assertNotIn("library", output)
+            output = subprocess.check_output([sys.executable, str(PROJECT_TOOLS), "resources",
+                                              str(root), ":app", "release", "R.color.brand"], text=True)
+            self.assertEqual(len(output.splitlines()), 1)
+            output = subprocess.check_output([sys.executable, str(PROJECT_TOOLS), "resources",
+                                              str(root), ":app", "debug", "@drawable/icon"], text=True)
+            self.assertIn("drawable/icon", output)
+
+    def test_lint_report_to_quickfix_lines(self):
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "lint-results-debug.xml"
+            report.write_text('<issues><issue id="Missing" severity="Warning" message="Missing icon">'
+                              '<location file="/tmp/app/AndroidManifest.xml" line="3" column="2"/>'
+                              '</issue></issues>')
+            output = subprocess.check_output([sys.executable, str(PROJECT_TOOLS), "lint",
+                                              str(report)], text=True)
+            self.assertEqual(output.strip(),
+                             "/tmp/app/AndroidManifest.xml:3:2: warning: Missing icon [Missing]")
 
 
 if __name__ == "__main__":

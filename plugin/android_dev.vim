@@ -30,6 +30,17 @@ command! -nargs=? AndroidMethods call android_dev#methods(<q-args>)
 command! -nargs=0 AndroidImport call android_dev#import()
 command! -nargs=0 AndroidNewProject call android_dev#new_project()
 command! -nargs=0 AndroidJdkSources call android_dev#jdk_sources()
+command! -nargs=* AndroidRun call call('android_dev#extra#run', split(<q-args>))
+command! -nargs=0 AndroidDevice call android_dev#extra#device()
+command! -nargs=? AndroidAppLog call android_dev#extra#app_log(<q-args>)
+command! -nargs=* AndroidLint call call('android_dev#extra#check', ['lint'] + split(<q-args>))
+command! -nargs=* AndroidUnitTest call call('android_dev#extra#check', ['unit'] + split(<q-args>))
+command! -nargs=* AndroidDeviceTest call call('android_dev#extra#check', ['device'] + split(<q-args>))
+command! -nargs=* AndroidSources call call('android_dev#extra#sources', split(<q-args>))
+command! -nargs=? AndroidResources call android_dev#extra#resources(<q-args>)
+command! -nargs=? AndroidReferences call android_dev#extra#references(<q-args>)
+command! -nargs=0 AndroidTasks call android_dev#extra#tasks()
+command! -nargs=0 AndroidReports call android_dev#extra#reports()
 
 if get(g:, 'android_dev_default_mappings', 1)
   nnoremap <silent> <leader>ff :AndroidProjectFiles<CR>
@@ -42,6 +53,8 @@ if get(g:, 'android_dev_default_mappings', 1)
   nnoremap <silent> <leader>fB :BTags<CR>
   nnoremap <silent> <leader>fs :Snippets<CR>
   nnoremap <silent> <leader>q :AndroidImport<CR>
+  nnoremap <silent> <leader>fr :AndroidResources<CR>
+  nnoremap <silent> <leader>fu :AndroidReferences<CR>
 endif
 
 " Android Studio macOS keymap where Vim's normal-mode keys remain unbound.
@@ -61,10 +74,14 @@ if get(g:, 'android_dev_ide_mappings', 1)
   if empty(maparg('<D-6>', 'n'))
     nnoremap <silent> <D-6> :AndroidLog<CR>
   endif
+  if empty(maparg('<S-F10>', 'n'))
+    nnoremap <silent> <S-F10> :AndroidRun<CR>
+  endif
 endif
 
 augroup android_dev_tools
   autocmd!
   autocmd BufEnter *.java,*.kt,*.xml call android_dev#attach_index()
   autocmd FileType java,xml,gradle,groovy,python,sh,c,cpp call android_dev#path_setup()
+  autocmd FileType java call android_dev#extra#completion_setup()
 augroup END

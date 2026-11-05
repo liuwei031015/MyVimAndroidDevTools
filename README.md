@@ -38,6 +38,14 @@ avoid duplicate definitions. Run `:helptags ALL`, then `:help android-dev-tools`
 | `:AndroidLog` | Open `adb logcat` in a Vim terminal |
 | `:AndroidNewProject` | Create a minimal Java/XML Android app |
 | `:AndroidJdkSources` | Index the installed JDK `src.zip`, or download OpenJDK sources if missing |
+| `:AndroidSources [module variant]` | Resolve third-party source archives with Gradle and rebuild the index |
+| `:AndroidResources [@type/name]` | Find a resource in the selected module/variant; open image files externally |
+| `:AndroidReferences [text]` | Search literal references into quickfix |
+| `:AndroidRun [module variant]` | Select device, install, and launch an app |
+| `:AndroidDevice` | Change the active adb device |
+| `:AndroidAppLog [V/D/I/W/E/F]` | Follow the running app process's log at a minimum level |
+| `:AndroidLint`, `:AndroidUnitTest`, `:AndroidDeviceTest` | Run checks for a selected module/variant |
+| `:AndroidTasks`, `:AndroidReports` | Pick a Gradle task or open a generated HTML report |
 
 Example: `:AndroidIndex :app debug`. When the variant is ambiguous, the command
 prompts for one. Set `g:android_dev_variant` to prefer a variant when querying
@@ -59,6 +67,10 @@ The selected variant's generated `R.txt` is converted into a reference-only
 `R.java`, so `R.id`, `R.layout`, and other resource fields are available to ctags.
 For multi-module builds, the Gradle task resolves project library artifacts and
 class navigation opens the module's actual Java source where available.
+
+Java buffers also offer manual class-name completion with `<C-x><C-u>` from the
+project API index. Set `g:android_dev_tag_completion = 0` to disable it. The
+plugin does not infer receiver types or perform semantic rename.
 
 The included Gradle init script is passed by `:AndroidIndex` without changing a
 project's build scripts. `:AndroidBuild` refreshes the index after a successful

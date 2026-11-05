@@ -1,5 +1,7 @@
 import groovy.json.JsonOutput
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
+import org.gradle.jvm.JvmLibrary
+import org.gradle.language.base.artifact.SourcesArtifact
 
 gradle.beforeProject { project ->
     def registerAndroidTasks = {
@@ -32,11 +34,28 @@ gradle.beforeProject { project ->
                     }
                     target.text = JsonOutput.toJson([
                             module: project.path, variant: variantName,
+                            applicationId: variant.hasProperty('applicationId') ? variant.applicationId.get() : '',
                             sdkDirectory: project.extensions.getByName('android').sdkDirectory.absolutePath,
                             compileSdk: project.extensions.getByName('android').compileSdk,
                             projectModules: modules,
                             artifacts: artifacts])
                     println "VIM_ANDROID_MANIFEST=${target.absolutePath}"
+                }
+            }
+            project.tasks.register("vimApiSources${suffix}") { task ->
+                task.group = 'vim android development'
+                task.description = "Resolve published Java sources for ${variantName}"
+                task.doLast {
+                    def componentIds = configuration.incoming.resolutionResult.allComponents*.id
+                    def result = project.dependencies.createArtifactResolutionQuery()
+                            .forComponents(componentIds)
+                            .withArtifacts(JvmLibrary, SourcesArtifact)
+                            .execute()
+                    result.resolvedComponents.each { component ->
+                        component.getArtifacts(SourcesArtifact).each { artifact ->
+                            println "VIM_ANDROID_SOURCE=${artifact.file.absolutePath}"
+                        }
+                    }
                 }
             }
         }

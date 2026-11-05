@@ -280,6 +280,11 @@ def lookup(index, action, query):
     if action == "classes":
         for name, info in sorted(entries.items()):
             print(f"{name}\t{info['coordinate']}")
+    elif action == "completions":
+        names = sorted({name.rsplit(".", 1)[-1] for name in entries
+                        if name.rsplit(".", 1)[-1].startswith(query) and "$" not in name})
+        for name in names[:100]:
+            print(name)
     elif action == "imports":
         for name in sorted(entries):
             if name.rsplit(".", 1)[-1] == query:
@@ -328,7 +333,7 @@ def lookup(index, action, query):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=("build", "classes", "imports", "methods", "location", "jdk"))
+    parser.add_argument("action", choices=("build", "classes", "imports", "completions", "methods", "location", "jdk"))
     parser.add_argument("path", nargs="?", default="")
     parser.add_argument("query", nargs="?", default="")
     args = parser.parse_args()
