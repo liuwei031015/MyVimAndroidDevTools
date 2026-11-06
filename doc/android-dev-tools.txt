@@ -2,7 +2,8 @@
 
                              *android-dev-tools*
 本插件将 UltiSnips、fzf、ctags、Gradle、javap、adb 接入 Vim。
-输入 :help android-dev-tools 打开；在帮助链接上按 CTRL-] 跳转，CTRL-T 返回。
+输入 :help android-dev-tools 打开；普通模式按 ,hk 直达快捷键章节。
+在帮助链接上按 CTRL-] 跳转，CTRL-T 返回。
 
 目录：
   安装与准备       |android-dev-install|
@@ -37,6 +38,7 @@ fzf.vim、UltiSnips；项目源码标签建议安装 vim-gutentags。
   ,fT       fzf 查光标下的标签
   ,fB       fzf 查当前缓冲区标签
   ,fs       fzf 查当前文件类型的片段
+  ,hk       打开本帮助文件的快捷键章节
   ,q        为光标下 Java 类插入 import
   ,fr       查找光标下资源
   ,fu       查找光标下文本的引用
@@ -53,8 +55,8 @@ fzf.vim、UltiSnips；项目源码标签建议安装 vim-gutentags。
 
 Android Studio 的完整语义补全、智能修复等功能需要语言分析能力，本插件
 只实现上表对应的操作。Vim 原生 CTRL-] 跳定义、CTRL-T 返回；
-插入模式 CTRL-SPACE 统一手动补全；终端无法传递该键时用 F2。
-候选菜单中 CTRL-N/CTRL-P 选择、CTRL-Y 确认，再按统一键可选下一项。
+插入模式 ,ac 统一手动补全。候选菜单中 CTRL-N/CTRL-P 选择、
+CTRL-Y 确认，再按 ,ac 可选下一项。普通模式 ,hk 打开本章节。
 CTRL-X CTRL-F 仍可直接补全本地路径。设置
 g:android_dev_ide_mappings = 0 或 g:android_dev_default_mappings = 0
 可分别关闭两组映射。
@@ -148,7 +150,7 @@ XML 属性种类庞大且包含自定义属性，这里仅覆盖常见写法。
 Vim 原生文件候选；已有部分文件名时按 CTRL-X CTRL-F 手动补全。
 设置 g:android_dev_auto_path = 0 可关闭自动弹出。
 Java、XML、Python、C/C++、Shell 和 Gradle 文件的插入模式可按
-CTRL-SPACE 手动补全；终端或输入法拦截时改用 F2。路径上下文使用
+,ac 手动补全（依次按逗号、a、c）。路径上下文使用
 Vim 文件补全；Java/XML 使用下述后台候选；其它文件类型使用 Vim 的
 关键词补全。旧键 CTRL-X CTRL-U 仍能展开当前片段候选，但不再同步查询
 类名；CTRL-X CTRL-] 仍是 Vim 原生 ctags 补全。

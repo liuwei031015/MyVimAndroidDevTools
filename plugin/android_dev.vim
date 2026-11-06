@@ -52,6 +52,7 @@ if get(g:, 'android_dev_default_mappings', 1)
   nnoremap <silent> <leader>fT :execute 'Tags ' . expand('<cword>')<CR>
   nnoremap <silent> <leader>fB :BTags<CR>
   nnoremap <silent> <leader>fs :Snippets<CR>
+  nnoremap <silent> <leader>hk :help android-dev-keys<CR>
   nnoremap <silent> <leader>q :AndroidImport<CR>
   nnoremap <silent> <leader>fr :AndroidResources<CR>
   nnoremap <silent> <leader>fu :AndroidReferences<CR>

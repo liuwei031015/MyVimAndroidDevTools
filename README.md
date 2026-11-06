@@ -82,8 +82,7 @@ a short idle delay, so typing does not wait for ctags. For complex expressions o
 unknown receiver types, check the displayed owner before accepting a method.
 Copilot's inline suggestion is hidden while Vim's completion menu is open. If
 Copilot owns `<Tab>`, use `<C-n>`/`<C-p>` and `<C-y>` for menu selection.
-Use `<C-Space>` to request completion in the current context; `<F2>` is a fallback
-for terminals or input methods that intercept Ctrl-Space. It opens file paths,
+Use `,ac` in Insert mode to request completion in the current context. It opens file paths,
 Java/XML API or resource candidates, and Vim keyword completion in other supported
 filetypes. After confirming a Java class candidate, its import is resolved when
 leaving Insert mode so lookup cannot pause continued typing.
@@ -111,7 +110,8 @@ project's build scripts. `:AndroidBuild` refreshes the index after a successful
 build. External `./gradlew` invocations do not trigger this plugin's index task;
 run `:AndroidIndex` after changing dependencies.
 
-For the complete shortcut list and troubleshooting, see `:help android-dev-tools`.
+Press `,hk` in Normal mode to open the shortcut reference. For the complete help
+and troubleshooting, see `:help android-dev-tools`.
 
 Android project Java/XML buffers automatically merge the bundled Android
 UltiSnips files with their normal filetype snippets. The templates cover

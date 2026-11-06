@@ -4,11 +4,7 @@ let s:completion_tool = s:root . '/python3/tag_completion.py'
 let s:resource_tool = s:root . '/python3/resource_completion.py'
 
 function! android_dev#snippets#map_manual() abort
-  for l:key in ['<C-Space>', '<F2>']
-    if empty(maparg(l:key, 'i'))
-      execute 'inoremap <buffer><silent><expr> ' . l:key . ' android_dev#snippets#manual()'
-    endif
-  endfor
+  inoremap <buffer><silent><expr> <leader>ac android_dev#snippets#manual()
 endfunction
 
 function! android_dev#snippets#manual() abort

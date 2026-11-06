@@ -1,6 +1,7 @@
 set nocompatible
 let s:root = fnamemodify(expand('<sfile>:p'), ':h:h')
 let &runtimepath .= ',' . s:root
+let mapleader = ','
 let g:android_dev_snippet_popup = 0
 execute 'source ' . fnameescape(s:root . '/plugin/android_dev.vim')
 
@@ -19,8 +20,10 @@ call assert_equal(0, v:shell_error)
 execute 'edit ' . fnameescape(s:activity)
 setlocal filetype=java
 let &l:tags = s:project . '/tags'
-call assert_match('android_dev#snippets#manual()', maparg('<C-Space>', 'i'))
-call assert_match('android_dev#snippets#manual()', maparg('<F2>', 'i'))
+call assert_match('android_dev#snippets#manual()', maparg(',ac', 'i'))
+call assert_equal('', maparg('<C-Space>', 'i'))
+call assert_equal('', maparg('<F2>', 'i'))
+call assert_match('help android-dev-keys', maparg(',hk', 'n'))
 call assert_equal('android_dev#snippets#complete', &l:completefunc)
 
 call setline(3, 'String path = "src/main/";')
