@@ -68,15 +68,26 @@ function! s:api_candidates(data, query, member) abort
     call add(l:methods, {'word': l:item.name,
           \ 'abbr': l:item.name . l:signature,
           \ 'menu': get(l:item, 'owner', ''), 'info': l:item.name . l:signature,
-          \ 'kind': 'm', 'user_data': json_encode({'type': 'method', 'signature': l:signature})})
+          \ 'kind': 'm', 'dup': 1,
+          \ 'user_data': json_encode({'type': 'method', 'signature': l:signature})})
   endfor
   if a:member
     return l:methods
   endif
   let l:classes = []
-  for l:name in get(a:data, 'classes', [])[:7]
+  for l:name in get(a:data, 'project_classes', [])[:6]
     call add(l:classes, {'word': l:name, 'abbr': l:name,
-          \ 'menu': '类', 'kind': 'C', 'user_data': 'android_dev_class'})
+          \ 'menu': '工程类', 'kind': 'C', 'user_data': 'android_dev_class'})
+  endfor
+  for l:name in get(a:data, 'classes', [])
+    if len(l:classes) >= 9
+      break
+    endif
+    if index(get(a:data, 'project_classes', []), l:name) >= 0
+      continue
+    endif
+    call add(l:classes, {'word': l:name, 'abbr': l:name,
+          \ 'menu': '依赖类', 'kind': 'C', 'user_data': 'android_dev_class'})
   endfor
   return a:query =~# '^[A-Z]' ? l:classes + l:methods : l:methods + l:classes
 endfunction
@@ -94,7 +105,8 @@ endfunction
 function! s:api_ready(buffer, row, column, line, start, query, member, snippets, channel, message) abort
   try
     let l:data = json_decode(a:message)
-    let l:items = a:snippets + s:api_candidates(l:data, a:query, a:member)
+    let l:api = s:api_candidates(l:data, a:query, a:member)
+    let l:items = a:query =~# '^[A-Z]' ? l:api + a:snippets : a:snippets + l:api
     call s:show(a:buffer, a:row, a:column, a:line, a:start, l:items)
   catch
   endtry

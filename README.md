@@ -69,8 +69,12 @@ For multi-module builds, the Gradle task resolves project library artifacts and
 class navigation opens the module's actual Java source where available.
 
 Java buffers show class and method candidates automatically after three typed
-characters. Method candidates include signatures and overloads; selecting one
-inserts a call with jumpable argument placeholders. Method candidates are not
+characters. Project source classes rank before dependency classes for uppercase
+prefixes such as `Android`; methods from the current class and its direct parent
+rank before unrelated methods for lowercase prefixes such as `show`. Method
+candidates include signatures and overloads; selecting one inserts a call with
+jumpable argument placeholders. Queries run in a cancellable background job after
+a short idle delay, so typing does not wait for ctags. Method candidates are not
 filtered by receiver type, so check the displayed owner before accepting one.
 Manual class-name completion remains available with `<C-x><C-u>`. Set
 `g:android_dev_tag_completion = 0` to disable API candidates. Run
