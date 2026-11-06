@@ -53,7 +53,9 @@ fzf.vim、UltiSnips；项目源码标签建议安装 vim-gutentags。
 
 Android Studio 的完整语义补全、智能修复等功能需要语言分析能力，本插件
 只实现上表对应的操作。Vim 原生 CTRL-] 跳定义、CTRL-T 返回；
-插入模式 CTRL-X CTRL-F 补全本地路径。设置
+插入模式 CTRL-SPACE 统一手动补全；终端无法传递该键时用 F2。
+候选菜单中 CTRL-N/CTRL-P 选择、CTRL-Y 确认，再按统一键可选下一项。
+CTRL-X CTRL-F 仍可直接补全本地路径。设置
 g:android_dev_ide_mappings = 0 或 g:android_dev_default_mappings = 0
 可分别关闭两组映射。
 
@@ -145,7 +147,11 @@ XML 属性种类庞大且包含自定义属性，这里仅覆盖常见写法。
 在 Android 工程内输入路径的 `/` 后，若前缀是现存目录，插件会显示
 Vim 原生文件候选；已有部分文件名时按 CTRL-X CTRL-F 手动补全。
 设置 g:android_dev_auto_path = 0 可关闭自动弹出。
-Java 中按 CTRL-X CTRL-U 可从已索引的类名手动补全；不推断对象类型。
+Java、XML、Python、C/C++、Shell 和 Gradle 文件的插入模式可按
+CTRL-SPACE 手动补全；终端或输入法拦截时改用 F2。路径上下文使用
+Vim 文件补全；Java/XML 使用下述后台候选；其它文件类型使用 Vim 的
+关键词补全。旧键 CTRL-X CTRL-U 仍能展开当前片段候选，但不再同步查询
+类名；CTRL-X CTRL-] 仍是 Vim 原生 ctags 补全。
 设置 g:android_dev_tag_completion = 0 可关闭。
 Java 输入至少三个字符后还会自动提示类名和方法名。例如输入 Android，
 工程类排在依赖类和片段前；输入 show，当前类及直接父类的方法优先。
@@ -155,6 +161,8 @@ versionViewModel.getV 这类已声明变量的成员前缀时，会优先只显�
 方法候选显示所属类及参数签名，重载方法分别列出。按 CTRL-N/CTRL-P
 选择、CTRL-Y 确认，
 会插入调用并停在第一个参数占位符，CTRL-J 跳到后续参数。
+确认 Java 类名候选后，离开插入模式时会尝试加入 import；同名类有多个来源时提示选择，
+java.lang、当前包和已导入的类不重复插入。
 补全查询在短暂输入停顿后于后台运行；继续输入会取消旧查询，不会等待
 ctags 完成。首次使用旧版依赖索引时会生成类名缓存，之后查询会更快。
 Copilot 默认在补全菜单显示时隐藏灰色建议；若它接管 TAB，菜单内请使用

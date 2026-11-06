@@ -306,11 +306,22 @@ function! android_dev#methods(query) abort
 endfunction
 
 function! android_dev#import() abort
+  call android_dev#import_name(expand('<cword>'), 0, 0)
+endfunction
+
+function! android_dev#import_name(name, quiet, timer) abort
   try
     if &filetype !=# 'java'
       throw 'AndroidImport requires a Java buffer'
     endif
-    let l:name = expand('<cword>')
+    let l:name = a:name
+    if l:name !~# '^[A-Za-z_$][A-Za-z0-9_$]*$'
+      return
+    endif
+    let l:existing = 'import\s\+[A-Za-z0-9_.$]*\.' . escape(l:name, '$') . '\s*;'
+    if join(getline(1, min([line('$'), 150])), "\n") =~# l:existing
+      return
+    endif
     let l:candidates = []
     let l:root = s:root() . '/'
     for l:tag in taglist('^' . escape(l:name, '\') . '$')
@@ -341,6 +352,9 @@ function! android_dev#import() abort
           \ '\<package\s\+\zs[A-Za-z0-9_.]\+\ze\s*;')
     call filter(l:candidates, 'v:val !=# "java.lang." . l:name && v:val !=# l:current_package . "." . l:name')
     if empty(l:candidates)
+      if a:quiet
+        return
+      endif
       throw 'No importable class found: ' . l:name
     endif
     let l:choice = len(l:candidates) == 1 ? 1 : inputlist(['Import ' . l:name . ':']
@@ -373,7 +387,9 @@ function! android_dev#import() abort
     call append(l:position, l:statement)
     call winrestview(l:view)
   catch
-    echoerr v:exception
+    if !a:quiet
+      echoerr v:exception
+    endif
   endtry
 endfunction
 

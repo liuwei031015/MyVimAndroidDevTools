@@ -82,13 +82,19 @@ a short idle delay, so typing does not wait for ctags. For complex expressions o
 unknown receiver types, check the displayed owner before accepting a method.
 Copilot's inline suggestion is hidden while Vim's completion menu is open. If
 Copilot owns `<Tab>`, use `<C-n>`/`<C-p>` and `<C-y>` for menu selection.
+Use `<C-Space>` to request completion in the current context; `<F2>` is a fallback
+for terminals or input methods that intercept Ctrl-Space. It opens file paths,
+Java/XML API or resource candidates, and Vim keyword completion in other supported
+filetypes. After confirming a Java class candidate, its import is resolved when
+leaving Insert mode so lookup cannot pause continued typing.
 XML buffers also complete common `android:`, `app:`, and `tools:` attributes as
 they are typed. Resource names appear after `@string/`, `@id/`, and other common
 resource types; Java buffers complete names after `R.string.`, `R.id.`, and the
 same resource types. Resource names come from the current module's source sets,
 including unsaved ID declarations in the current buffer. A timestamp-checked
 cache in `.vim-api/resource-completion/` keeps repeated queries fast.
-Manual class-name completion remains available with `<C-x><C-u>`. Set
+`<C-x><C-u>` remains a snippet-only fallback; `<C-x><C-]>` remains Vim's native
+ctags completion. Set
 `g:android_dev_tag_completion = 0` to disable API candidates. Run
 `:AndroidIndex` after updating to rebuild dependency tags with signatures.
 The plugin does not perform semantic rename.
@@ -124,3 +130,5 @@ older Android versions. AndroidX and ViewBinding templates need their matching
 project dependencies and build features.
 
 Run focused checks with `python3 -m unittest discover -s tests -v`.
+Vim mapping and import integration checks run with
+`vim -Nu NONE -i NONE -n -es -S tests/test_vim_completion.vim`.
