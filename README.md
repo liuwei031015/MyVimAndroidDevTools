@@ -82,10 +82,23 @@ a short idle delay, so typing does not wait for ctags. For complex expressions o
 unknown receiver types, check the displayed owner before accepting a method.
 Copilot's inline suggestion is hidden while Vim's completion menu is open. If
 Copilot owns `<Tab>`, use `<C-n>`/`<C-p>` and `<C-y>` for menu selection.
+XML buffers also complete common `android:`, `app:`, and `tools:` attributes as
+they are typed. Resource names appear after `@string/`, `@id/`, and other common
+resource types; Java buffers complete names after `R.string.`, `R.id.`, and the
+same resource types. Resource names come from the current module's source sets,
+including unsaved ID declarations in the current buffer. A timestamp-checked
+cache in `.vim-api/resource-completion/` keeps repeated queries fast.
 Manual class-name completion remains available with `<C-x><C-u>`. Set
 `g:android_dev_tag_completion = 0` to disable API candidates. Run
 `:AndroidIndex` after updating to rebuild dependency tags with signatures.
 The plugin does not perform semantic rename.
+
+`examples/device-name/` contains a complete XML, Activity, and ViewModel
+workflow. Its readme lists the two AndroidX dependencies needed by a generated
+project. The corresponding test checks completion and resource references across
+all files; set `ANDROID_WORKFLOW_BUILD=1` when running that test to compile an APK.
+The `classAndroidViewModel` and `liveDataField` snippets cover the ViewModel
+setup used in this workflow.
 
 The included Gradle init script is passed by `:AndroidIndex` without changing a
 project's build scripts. `:AndroidBuild` refreshes the index after a successful

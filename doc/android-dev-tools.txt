@@ -130,7 +130,8 @@ Android 工程的 Java/XML 缓冲区会自动加载插件专属 Android 片段�
     jparseInt、jforeachMap、streamFilter、streamMap、streamDistinct、
     streamGroupBy、streamFirst、streamCount、streamAnyMatch、streamForEach。
   AndroidX：activityGetContent、viewModelGet、liveDataObserve、
-    recyclerSetup、fragmentReplace、workOnce、notificationCompat、
+    classAndroidViewModel、liveDataField、recyclerSetup、fragmentReplace、
+    workOnce、notificationCompat、
     contextColor、viewBindingInflate。
   XML 属性：aContentDescription、aElevation、aForeground、aTint、
     aTextAppearance、aEllipsize、aImeOptions、aSrcCompat 等。
@@ -160,6 +161,14 @@ Copilot 默认在补全菜单显示时隐藏灰色建议；若它接管 TAB，�
 CTRL-N/CTRL-P 和 CTRL-Y。此插件不修改 TAB 映射。
 输入对象.方法前缀时仅提示方法；ctags 不推断对象类型，请核对候选的
 所属类。升级插件后运行 :AndroidIndex，重新生成含签名的依赖标签。
+
+XML 中直接输入 android:te、app:layout_con 等，会提示常用属性；确认
+属性后自动补上 =""，光标留在引号内。输入 @string/、@id/ 等资源前缀后
+会提示当前 module 的资源名；Java 中输入 R.string.、R.id. 也会提示。
+新写但未保存的当前 XML 文件 ID 同样参与提示。资源名缓存放在工程的
+.vim-api/resource-completion/，资源文件修改后会自动更新。候选不包含
+依赖库和 Android 系统内置资源；需要时可用 :AndroidResources 搜索。
+插件 examples/device-name/ 提供布局、Activity、ViewModel 的完整示例。
 
 ==============================================================================
 运行、资源与检查                                         *android-dev-workflow*

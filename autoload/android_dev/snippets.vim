@@ -1,6 +1,7 @@
 let s:root = fnamemodify(expand('<sfile>:p'), ':h:h:h')
 let s:metadata = json_decode(join(readfile(s:root . '/data/snippet_labels.json'), "\n"))
 let s:completion_tool = s:root . '/python3/tag_completion.py'
+let s:resource_tool = s:root . '/python3/resource_completion.py'
 
 function! android_dev#snippets#setup() abort
   if !get(g:, 'android_dev_snippet_popup', 1) || exists(':UltiSnipsAddFiletypes') != 2
@@ -114,6 +115,23 @@ function! s:api_ready(buffer, row, column, line, start, query, member, snippets,
   endtry
 endfunction
 
+function! s:resource_ready(buffer, row, column, line, start, channel, message) abort
+  try
+    call s:show(a:buffer, a:row, a:column, a:line, a:start, json_decode(a:message))
+  catch
+  endtry
+endfunction
+
+function! s:resource_popup(buffer, row, column, line, start, context) abort
+  let l:command = ['python3', s:resource_tool, expand('%:p'), a:context, '--buffer']
+  let b:android_dev_snippet_job = job_start(l:command, {'out_cb': function('s:resource_ready',
+        \ [a:buffer, a:row, a:column, a:line, a:start])})
+  if job_status(b:android_dev_snippet_job) ==# 'run'
+    call ch_sendraw(b:android_dev_snippet_job, json_encode(getline(1, '$')) . "\n")
+    call ch_close_in(b:android_dev_snippet_job)
+  endif
+endfunction
+
 function! android_dev#snippets#schedule() abort
   if !exists('b:android_dev_snippet_items') || empty(b:android_dev_snippet_items)
         \ || pumvisible() || !empty(complete_info(['mode']).mode)
@@ -153,6 +171,32 @@ function! android_dev#snippets#popup(buffer, row, column, timer) abort
   let l:before = strpart(getline('.'), 0, col('.') - 1)
   if &filetype ==# 'java' && l:before =~# '^\s*\(import\|package\)\s'
     return
+  endif
+  if &filetype ==# 'xml'
+    let l:resource = matchlist(l:before,
+          \ '@+\?\(string\|color\|dimen\|drawable\|mipmap\|layout\|id\|style\|array\)/\([A-Za-z0-9_]*\)$')
+    if !empty(l:resource) && strlen(l:resource[2]) >= 1
+      call s:resource_popup(a:buffer, a:row, a:column, getline('.'),
+            \ strlen(l:before) - strlen(l:resource[2]),
+            \ 'resource:' . l:resource[1] . ':' . l:resource[2])
+      return
+    endif
+    let l:attribute = matchlist(l:before, '\s\(android\|app\|tools\):\([A-Za-z_]*\)$')
+    if !empty(l:attribute) && strlen(l:attribute[2]) >= 2
+      call s:resource_popup(a:buffer, a:row, a:column, getline('.'),
+            \ strlen(l:before) - strlen(l:attribute[2]),
+            \ 'attribute:' . l:attribute[1] . ':' . l:attribute[2])
+      return
+    endif
+  elseif &filetype ==# 'java'
+    let l:resource = matchlist(l:before,
+          \ '\<R\.\(string\|color\|dimen\|drawable\|mipmap\|layout\|id\|style\|array\)\.\([A-Za-z0-9_]*\)$')
+    if !empty(l:resource) && strlen(l:resource[2]) >= 2
+      call s:resource_popup(a:buffer, a:row, a:column, getline('.'),
+            \ strlen(l:before) - strlen(l:resource[2]),
+            \ 'resource:' . l:resource[1] . ':' . l:resource[2])
+      return
+    endif
   endif
   let l:prefix = matchstr(l:before, '[A-Za-z][A-Za-z0-9_]*$')
   let l:start = strlen(l:before) - strlen(l:prefix)
@@ -213,12 +257,20 @@ function! android_dev#snippets#expand_selected() abort
   let l:data = get(v:completed_item, 'user_data', '')
   if l:data ==# 'android_dev_snippet'
     call timer_start(0, function('android_dev#snippets#expand'))
+  elseif l:data ==# 'android_dev_xml_attr'
+    call timer_start(0, function('android_dev#snippets#xml_attr_cursor'))
   elseif l:data =~# '{'
     let l:item = json_decode(l:data)
     if get(l:item, 'type', '') ==# 'method'
       call timer_start(0, function('android_dev#snippets#expand_method',
             \ [get(v:completed_item, 'word', ''), get(l:item, 'signature', '')]))
     endif
+  endif
+endfunction
+
+function! android_dev#snippets#xml_attr_cursor(timer) abort
+  if mode() ==# 'i'
+    call feedkeys("\<Left>", 'n')
   endif
 endfunction
 

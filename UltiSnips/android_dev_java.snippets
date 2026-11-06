@@ -328,6 +328,27 @@ public class `!p snip.rv = snip.basename` extends ViewModel {
 }
 endsnippet
 
+snippet classAndroidViewModel "Create AndroidViewModel with Application context"
+import android.app.Application;
+import androidx.lifecycle.AndroidViewModel;
+
+public class `!p snip.rv = snip.basename` extends AndroidViewModel {
+	public `!p snip.rv = snip.basename`(Application application) {
+		super(application);
+	}
+
+	$1
+}
+endsnippet
+
+snippet liveDataField "MutableLiveData field and read-only getter"
+private final androidx.lifecycle.MutableLiveData<${1:String}> ${2:name} = new androidx.lifecycle.MutableLiveData<>();
+
+public androidx.lifecycle.LiveData<$1> ${3:getName}() {
+	return $2;
+}
+endsnippet
+
 snippet fragmentInflate "Fragment onCreateView" i
 inflater.inflate(R.layout.${1:layout}, null);
 endsnippet

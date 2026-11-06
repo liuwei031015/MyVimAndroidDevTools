@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Device Name</string>
+    <string name="default_device_name">My device</string>
+    <string name="current_device_name">Current device: %1$s</string>
+    <string name="device_name_hint">Device name</string>
+    <string name="device_name_required">Enter a device name</string>
+    <string name="save_device_name">Save</string>
+</resources>
