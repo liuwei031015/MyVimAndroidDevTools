@@ -14,15 +14,23 @@ SOURCE = """package example;
 
 class AndroidAppUtils {}
 class AndroidScreenOrientation {}
+class VersionViewModel {
+    public void getVersionInfo() {}
+}
 class BaseActivity {
     public void showLoading() {}
     public void showLoading(String message) {}
 }
 public class AboutActivity extends BaseActivity {
-    void develop() {
+    private VersionViewModel versionViewModel;
+    private int versionState;
+    void develop(int requestCode) {
+        final int currentVersionCode = 1;
         showLoading();
+        versionViewModel.getVersionInfo();
         AndroidAppUtils helper = null;
     }
+    void later() {}
 }
 """
 
@@ -46,10 +54,16 @@ class CompletionWorkshop(unittest.TestCase):
             external.write_text("!_TAG_FILE_SORTED\t1\t/0=unsorted/\n"
                                 "show\tExternal.java\t1;\"\tm\tclass:ExternalDialog\tsignature:()\n")
 
-            def suggest(prefix):
-                output = subprocess.check_output([sys.executable, str(QUERY), str(index),
-                                                  prefix, str(source), str(tags), str(external)],
-                                                 text=True)
+            def suggest(prefix, row=None, receiver="", lines=None):
+                command = [sys.executable, str(QUERY), str(index), prefix,
+                           str(source), str(tags), str(external)]
+                if row is not None:
+                    command.append("--buffer")
+                if receiver:
+                    command.append("--receiver=" + receiver)
+                payload = json.dumps({"lines": lines or SOURCE.splitlines(), "row": row}) \
+                    if row is not None else None
+                output = subprocess.check_output(command, input=payload, text=True)
                 return json.loads(output)
 
             show = suggest("show")
@@ -59,6 +73,25 @@ class CompletionWorkshop(unittest.TestCase):
             self.assertEqual(android["project_classes"][0], "AndroidAppUtils")
             self.assertIn("AndroidRemote", android["classes"])
             self.assertEqual(android["methods"], [])
+
+            lines = SOURCE.splitlines()
+            inside = lines.index("        showLoading();") + 1
+            outside = lines.index("    void later() {}") + 1
+            member = suggest("getV", inside, "versionViewModel")
+            self.assertEqual([(item["name"], item["owner"])
+                              for item in member["methods"]],
+                             [("getVersionInfo", "VersionViewModel")])
+
+            self.assertIn("versionViewModel", suggest("version", inside)["variables"])
+            self.assertEqual(suggest("current", inside)["variables"],
+                             ["currentVersionCode"])
+            self.assertEqual(suggest("current", outside)["variables"], [])
+            self.assertEqual(suggest("request", inside)["variables"], ["requestCode"])
+            self.assertEqual(suggest("request", outside)["variables"], [])
+            edited = lines.copy()
+            edited[inside - 1] = "        int newlyTypedVariable = 1;"
+            self.assertIn("newlyTypedVariable",
+                          suggest("newly", inside, lines=edited)["variables"])
 
 
 if __name__ == "__main__":

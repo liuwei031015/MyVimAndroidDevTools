@@ -10,6 +10,38 @@ import sys
 import tempfile
 
 
+DECLARATION = re.compile(
+    r"^\s*(?:(?:public|protected|private|static|final|volatile|transient)\s+)*"
+    r"([A-Za-z_$][\w.$<>?\[\], ]*)\s+([A-Za-z_$][\w$]*)\s*(?:=|;|,)"
+)
+PARAMETER = re.compile(r"([A-Za-z_$][\w.$<>?\[\]]*)\s+([A-Za-z_$][\w$]*)$")
+
+
+def buffer_symbols(lines, row, prefix, receiver=""):
+    active = {}
+    depth = 0
+    for line in lines[:row]:
+        code = re.sub(r'"(?:\\.|[^"\\])*"', '""', line).split("//", 1)[0]
+        if not re.match(r"\s*(?:return|throw|new|if|while|for|switch|case)\b", code):
+            declaration = DECLARATION.match(code)
+            if declaration:
+                type_name, name = declaration.groups()
+                active[name] = (depth, type_name.split()[-1].rsplit(".", 1)[-1])
+            parameter_list = re.search(r"\(([^()]*)\)\s*(?:throws\s+[^{}]+)?\{", code)
+            if parameter_list and re.search(r"\b[A-Za-z_$][\w$]*\s*$", code[:parameter_list.start()]):
+                for part in parameter_list.group(1).split(","):
+                    parameter = PARAMETER.search(part.strip())
+                    if parameter:
+                        type_name, name = parameter.groups()
+                        active[name] = (depth + 1, type_name.rsplit(".", 1)[-1])
+        next_depth = depth + code.count("{") - code.count("}")
+        if next_depth < depth:
+            active = {name: value for name, value in active.items() if value[0] <= next_depth}
+        depth = next_depth
+    variables = sorted(name for name in active if name.startswith(prefix))
+    return variables, active.get(receiver, (0, ""))[1]
+
+
 def matching_lines(path, prefix, limit):
     if not Path(path).is_file() or not Path(path).stat().st_size:
         return
@@ -105,7 +137,7 @@ def project_classes(prefix, tagfiles, root, current_file, limit=12):
     return [name for name, _ in sorted(found.items(), key=lambda item: item[1])[:limit]]
 
 
-def methods(prefix, tagfiles, current_file="", root=None, limit=30):
+def methods(prefix, tagfiles, current_file="", root=None, owner_hint="", limit=30):
     result, seen = [], set()
     current = Path(current_file).resolve()
     owners = current_owners(current_file)
@@ -129,13 +161,17 @@ def methods(prefix, tagfiles, current_file="", root=None, limit=30):
             seen.add(key)
             if local:
                 project_count += 1
-            scope = 0 if same_file else 1 if owner in owners and local else 2 if local else 3
+            scope = (0 if owner_hint and owner == owner_hint else
+                     1 if same_file else 2 if owner in owners and local else
+                     3 if local else 4)
             rank = (scope, fields[0] != prefix, len(fields[0]), fields[0], owner)
             result.append((rank, {"name": fields[0], "owner": owner,
                                   "signature": signature}))
-        if project_count >= 12:
+        if project_count >= 12 and not owner_hint:
             break
     result.sort(key=lambda item: item[0])
+    if owner_hint and any(item[1]["owner"] == owner_hint for item in result):
+        result = [item for item in result if item[1]["owner"] == owner_hint]
     return [item for _, item in result[:limit]]
 
 
@@ -154,14 +190,25 @@ def classes(index, prefix, limit=30):
     return list(dict.fromkeys(names))[:limit]
 
 
-def query(index, prefix, current_file, tagfiles):
+def query(index, prefix, current_file, tagfiles, owner_hint="", buffer=None, receiver=""):
     root = project_root(index, current_file)
+    variables, receiver_type = buffer_symbols(buffer["lines"], buffer["row"], prefix, receiver) \
+        if buffer else ([], "")
+    owner_hint = receiver_type or owner_hint
     if prefix[:1].isupper():
         return {"project_classes": project_classes(prefix, tagfiles, root, current_file),
-                "classes": classes(index, prefix), "methods": []}
-    return {"project_classes": [], "classes": [],
-            "methods": methods(prefix, tagfiles, current_file, root)}
+                "classes": classes(index, prefix), "methods": [], "variables": variables}
+    return {"project_classes": [], "classes": [], "variables": variables,
+            "methods": methods(prefix, tagfiles, current_file, root, owner_hint)}
 
 
 if __name__ == "__main__":
-    print(json.dumps(query(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4:]), ensure_ascii=False))
+    options = [arg for arg in sys.argv[4:] if arg.startswith("--owner=")]
+    receivers = [arg for arg in sys.argv[4:] if arg.startswith("--receiver=")]
+    tagfiles = [arg for arg in sys.argv[4:] if not arg.startswith(("--owner=", "--receiver=", "--buffer"))]
+    owner_hint = options[0].split("=", 1)[1] if options else ""
+    receiver = receivers[0].split("=", 1)[1] if receivers else ""
+    buffer = json.load(sys.stdin) if "--buffer" in sys.argv[4:] else None
+    print(json.dumps(query(sys.argv[1], sys.argv[2], sys.argv[3], tagfiles,
+                           owner_hint, buffer, receiver),
+                     ensure_ascii=False))

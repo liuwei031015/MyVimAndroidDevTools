@@ -106,7 +106,9 @@ function! s:api_ready(buffer, row, column, line, start, query, member, snippets,
   try
     let l:data = json_decode(a:message)
     let l:api = s:api_candidates(l:data, a:query, a:member)
-    let l:items = a:query =~# '^[A-Z]' ? l:api + a:snippets : a:snippets + l:api
+    let l:variables = map(get(l:data, 'variables', []),
+          \ "{'word': v:val, 'abbr': v:val, 'menu': '本文件变量', 'kind': 'v'}")
+    let l:items = a:query =~# '^[A-Z]' ? l:api + a:snippets : l:variables + a:snippets + l:api
     call s:show(a:buffer, a:row, a:column, a:line, a:start, l:items)
   catch
   endtry
@@ -160,6 +162,7 @@ function! android_dev#snippets#popup(buffer, row, column, timer) abort
   endif
   let l:member = l:previous ==# '.'
   let l:items = l:member ? [] : android_dev#snippets#candidates(l:prefix)[:5]
+  let l:receiver = l:member ? matchstr(strpart(l:before, 0, l:start - 1), '[A-Za-z_$][A-Za-z0-9_$]*$') : ''
   if &filetype ==# 'java' && strlen(l:prefix) >= 3
         \ && get(g:, 'android_dev_tag_completion', 1) && has('job')
     try
@@ -169,10 +172,18 @@ function! android_dev#snippets#popup(buffer, row, column, timer) abort
     endtry
     let l:command = ['python3', s:completion_tool, l:index, l:prefix, expand('%:p')]
           \ + tagfiles()
+    call add(l:command, '--buffer')
+    if !empty(l:receiver)
+      call add(l:command, '--receiver=' . l:receiver)
+    endif
     let b:android_dev_snippet_job = job_start(l:command, {'out_cb': function('s:api_ready',
           \ [a:buffer, a:row, a:column, getline('.'), l:start, l:prefix, l:member, l:items])})
     if job_status(b:android_dev_snippet_job) ==# 'fail'
       call s:show(a:buffer, a:row, a:column, getline('.'), l:start, l:items)
+    else
+      call ch_sendraw(b:android_dev_snippet_job,
+            \ json_encode({'lines': getline(1, '$'), 'row': a:row}) . "\n")
+      call ch_close_in(b:android_dev_snippet_job)
     endif
     return
   endif
