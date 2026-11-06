@@ -2,7 +2,7 @@
 
                              *android-dev-tools*
 本插件将 UltiSnips、fzf、ctags、Gradle、javap、adb 接入 Vim。
-输入 :help android-dev-tools 打开；普通模式按 ,hk 直达快捷键章节。
+输入 :help android-dev-tools 打开；普通或插入模式按 ,hk 直达快捷键章节。
 在帮助链接上按 CTRL-] 跳转，CTRL-T 返回。
 
 目录：
@@ -27,7 +27,9 @@ fzf.vim、UltiSnips；项目源码标签建议安装 vim-gutentags。
 快捷键                                                     *android-dev-keys*
 
 默认 <Leader> 取决于你的 vimrc；设为逗号时，下表的 ,ff 表示依次按 , f f。
-这些都是普通模式映射；Vim 原有的 CTRL-]、CTRL-T 等按键仍保留。
+下表是普通模式映射；,hk 也可在插入模式使用。
+插入模式按 ,hk 会先退出插入模式，再打开帮助。
+Vim 原有的 CTRL-]、CTRL-T 等按键仍保留。
 
   ,ff       fzf 查 Android 工程文件
   ,fc       同上，预填光标下单词
@@ -55,11 +57,32 @@ fzf.vim、UltiSnips；项目源码标签建议安装 vim-gutentags。
 
 Android Studio 的完整语义补全、智能修复等功能需要语言分析能力，本插件
 只实现上表对应的操作。Vim 原生 CTRL-] 跳定义、CTRL-T 返回；
-插入模式 ,ac 统一手动补全。候选菜单中 CTRL-N/CTRL-P 选择、
-CTRL-Y 确认，再按 ,ac 可选下一项。普通模式 ,hk 打开本章节。
-CTRL-X CTRL-F 仍可直接补全本地路径。设置
+插入模式 ,ac 按当前位置手动补全；已有菜单时重新查询，不会选下一项。
+Java 异步候选为空时，,ac 会继续尝试 Vim 原生 tags 补全。
+普通或插入模式按 ,hk 打开本章节。设置
 g:android_dev_ide_mappings = 0 或 g:android_dev_default_mappings = 0
 可分别关闭两组映射。
+
+Vim 原生插入模式补全（依次按下所列按键；部分来源需另行配置）：
+
+  CTRL-N / CTRL-P    按 'complete' 选项查关键词；菜单中选下一项/上一项
+  CTRL-X CTRL-]     从 tags 补全类名、方法名等（需已生成并加载 tags）
+  CTRL-X CTRL-F     补全文件名或本地路径
+  CTRL-X CTRL-N     仅从当前文件补全关键词
+  CTRL-X CTRL-I     从当前文件及 include 文件补全关键词
+  CTRL-X CTRL-L     补全整行
+  CTRL-X CTRL-K     从 'dictionary' 指定的词典补全
+  CTRL-X CTRL-T     从 'thesaurus' 指定的同义词文件补全
+  CTRL-X CTRL-D     按 'define' 和 'path' 查定义或宏
+  CTRL-X CTRL-V     补全 Vim 命令行内容
+  CTRL-X CTRL-U     调用当前缓冲区的 'completefunc'；本插件在 Java/XML
+                    中用它显示片段候选，自动候选也经此菜单显示
+  CTRL-X CTRL-O     调用 'omnifunc'；需文件类型配置了对应函数
+  CTRL-Y            确认菜单中选中的候选
+  CTRL-E            取消本次补全并还原原输入
+
+普通模式导航：CTRL-] 跳到光标下标签定义，CTRL-T 返回；CTRL-O/CTRL-I
+在跳转列表中后退/前进。输入 :help ins-completion 可查 Vim 的完整补全说明。
 
 ==============================================================================
 依赖索引与导入                                             *android-dev-index*

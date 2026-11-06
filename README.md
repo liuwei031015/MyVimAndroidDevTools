@@ -82,9 +82,11 @@ a short idle delay, so typing does not wait for ctags. For complex expressions o
 unknown receiver types, check the displayed owner before accepting a method.
 Copilot's inline suggestion is hidden while Vim's completion menu is open. If
 Copilot owns `<Tab>`, use `<C-n>`/`<C-p>` and `<C-y>` for menu selection.
-Use `,ac` in Insert mode to request completion in the current context. It opens file paths,
+Use `,ac` in Insert mode to request completion in the current context, including
+when an automatic menu is already open. It opens file paths,
 Java/XML API or resource candidates, and Vim keyword completion in other supported
-filetypes. After confirming a Java class candidate, its import is resolved when
+filetypes. When a Java query has no API candidates, it tries native tag completion.
+After confirming a Java class candidate, its import is resolved when
 leaving Insert mode so lookup cannot pause continued typing.
 XML buffers also complete common `android:`, `app:`, and `tools:` attributes as
 they are typed. Resource names appear after `@string/`, `@id/`, and other common
@@ -110,7 +112,7 @@ project's build scripts. `:AndroidBuild` refreshes the index after a successful
 build. External `./gradlew` invocations do not trigger this plugin's index task;
 run `:AndroidIndex` after changing dependencies.
 
-Press `,hk` in Normal mode to open the shortcut reference. For the complete help
+Press `,hk` in Normal or Insert mode to open the shortcut reference. For the complete help
 and troubleshooting, see `:help android-dev-tools`.
 
 Android project Java/XML buffers automatically merge the bundled Android

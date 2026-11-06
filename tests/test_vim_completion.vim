@@ -24,6 +24,7 @@ call assert_match('android_dev#snippets#manual()', maparg(',ac', 'i'))
 call assert_equal('', maparg('<C-Space>', 'i'))
 call assert_equal('', maparg('<F2>', 'i'))
 call assert_match('help android-dev-keys', maparg(',hk', 'n'))
+call assert_match('<Esc>:help android-dev-keys<CR>', maparg(',hk', 'i'))
 call assert_equal('android_dev#snippets#complete', &l:completefunc)
 
 call setline(3, 'String path = "src/main/";')

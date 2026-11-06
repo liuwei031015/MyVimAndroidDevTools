@@ -8,27 +8,30 @@ function! android_dev#snippets#map_manual() abort
 endfunction
 
 function! android_dev#snippets#manual() abort
-  if pumvisible()
-    return "\<C-n>"
-  endif
+  let l:cancel = pumvisible() || !empty(complete_info(['mode']).mode) ? "\<C-e>" : ''
   let l:before = strpart(getline('.'), 0, col('.') - 1)
   let l:piece = matchstr(l:before, '[^ \t"''=():;,]*$')
   if l:piece =~# '/' && l:piece !~# '^@'
-    return "\<C-x>\<C-f>"
+    return l:cancel . "\<C-x>\<C-f>"
   endif
   if index(['java', 'xml'], &filetype) < 0
-    return "\<C-n>"
+    return l:cancel . "\<C-n>"
   endif
   if &filetype ==# 'java' && l:before =~# '^\s*\(import\|package\)\s'
-    return "\<C-n>"
+    return l:cancel . "\<C-n>"
   endif
   if l:before !~# '[A-Za-z0-9_]$' && l:before !~# '\%(@+\?\w\+/\|\<R\.\w\+\.\|\<\%(android\|app\|tools\):\)$'
-    return "\<C-n>"
+    return l:cancel . "\<C-n>"
   endif
   call android_dev#snippets#reset()
-  call timer_start(0, function('android_dev#snippets#popup',
-        \ [bufnr('%'), line('.'), col('.'), 1]))
-  return ''
+  call timer_start(0, function('android_dev#snippets#manual_popup'))
+  return l:cancel
+endfunction
+
+function! android_dev#snippets#manual_popup(timer) abort
+  if mode() ==# 'i'
+    call android_dev#snippets#popup(bufnr('%'), line('.'), col('.'), 1, 0)
+  endif
 endfunction
 
 function! android_dev#snippets#setup() abort
@@ -120,24 +123,31 @@ function! s:api_candidates(data, query, member) abort
   return a:query =~# '^[A-Z]' ? l:classes + l:methods : l:methods + l:classes
 endfunction
 
-function! s:show(buffer, row, column, line, start, items) abort
-  if empty(a:items) || bufnr('%') != a:buffer || mode() !=# 'i'
+function! s:show(buffer, row, column, line, start, items, ...) abort
+  if bufnr('%') != a:buffer || mode() !=# 'i'
         \ || pumvisible() || !empty(complete_info(['mode']).mode)
         \ || line('.') != a:row || col('.') != a:column || getline('.') !=# a:line
+    return
+  endif
+  if empty(a:items)
+    if a:0 && a:1 ==# 'tags'
+      call feedkeys("\<C-x>\<C-]>", 'n')
+    endif
     return
   endif
   let b:android_dev_snippet_pending = {'start': a:start, 'items': a:items}
   call feedkeys("\<C-x>\<C-u>", 'n')
 endfunction
 
-function! s:api_ready(buffer, row, column, line, start, query, member, snippets, channel, message) abort
+function! s:api_ready(buffer, row, column, line, start, query, member, snippets, manual, channel, message) abort
   try
     let l:data = json_decode(a:message)
     let l:api = s:api_candidates(l:data, a:query, a:member)
     let l:variables = map(get(l:data, 'variables', []),
           \ "{'word': v:val, 'abbr': v:val, 'menu': '本文件变量', 'kind': 'v'}")
     let l:items = a:query =~# '^[A-Z]' ? l:api + a:snippets : l:variables + a:snippets + l:api
-    call s:show(a:buffer, a:row, a:column, a:line, a:start, l:items)
+    call s:show(a:buffer, a:row, a:column, a:line, a:start, l:items,
+          \ a:manual ? 'tags' : '')
   catch
   endtry
 endfunction
@@ -248,9 +258,11 @@ function! android_dev#snippets#popup(buffer, row, column, force, timer) abort
       call add(l:command, '--receiver=' . l:receiver)
     endif
     let b:android_dev_snippet_job = job_start(l:command, {'out_cb': function('s:api_ready',
-          \ [a:buffer, a:row, a:column, getline('.'), l:start, l:prefix, l:member, l:items])})
+          \ [a:buffer, a:row, a:column, getline('.'), l:start, l:prefix, l:member, l:items,
+          \ a:force])})
     if job_status(b:android_dev_snippet_job) ==# 'fail'
-      call s:show(a:buffer, a:row, a:column, getline('.'), l:start, l:items)
+      call s:show(a:buffer, a:row, a:column, getline('.'), l:start, l:items,
+            \ a:force ? 'tags' : '')
     else
       call ch_sendraw(b:android_dev_snippet_job,
             \ json_encode({'lines': getline(1, '$'), 'row': a:row}) . "\n")
@@ -258,7 +270,8 @@ function! android_dev#snippets#popup(buffer, row, column, force, timer) abort
     endif
     return
   endif
-  call s:show(a:buffer, a:row, a:column, getline('.'), l:start, l:items)
+  call s:show(a:buffer, a:row, a:column, getline('.'), l:start, l:items,
+        \ a:force && &filetype ==# 'java' ? 'tags' : '')
 endfunction
 
 function! android_dev#snippets#complete(findstart, base) abort
